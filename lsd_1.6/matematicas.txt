@@ -1,0 +1,41 @@
+
+- Ecuacion de la recta que pasa por dos puntos
+	(x-x1) / (x2-x1)   =   (y-y1)/(y2-y1)
+
+	(y-y1) / (x-x1)   =   (y2-y1) / (x2-x1)
+	y = ( (y2-y1) / (x2-x1) * x)  - ( (y2-y1) / (x2-x1) * x1 )  + y1 
+
+- Perpendicular que pase por un punto.
+	Ecuacion de la recta : y = m *x + b
+
+	La perpendicular es y = -(1/m) *x + b
+	Ejemplo:
+
+	y = -2x +3
+	quiero que pase por el punto (5, -2)
+
+	perpendicular : -2= 1/2 *5 +b
+			b = -9/2
+			y = 1/2 *x + -9/2
+
+
+- Rectas perpendiculares
+	Tienen pendientes inversas y signo contrario. 
+	y1 = 2x - 3 
+	y2 = -(1/2)x + 4 
+
+
+- INterseccion de dos rectas
+   y = M*x + N
+   y2 = M2*x + N2
+   M*x + N = M2*x +N2
+   N - N2 = M2*x - M*x
+   N - N2 = (M2 - M) * x
+Por cada "segmento" queremos ver si tiene un segmento "hermano" paralelo. 
+Entonce hacer :
+  - tomar los extremos y el punto medio de este "segmento origen". Por cada uno de esos 3 puntos del segmento :
+   - calcular la funcion perpendicular. 
+   - Ver si la perpendicular "cruza" algun otro segmento calculado (aca ver si es facil detectar facilmente segmentos paralelos, o similar, para mejorar el rendimiento y no comparar con todos).
+   - Si la perpendicular cruza a la funcion de algun otro segmento, entonces calcular el punto (x,y) donde intersecta la funcion del segmento que cruza. De ese punto, analizar
+     - si es parte del segmento o si esta fuera. Si es parte del segmento, entonces :
+        - calcular la distancia de la perpendicular desde el punto (x,y) a alguno de los 3 puntos del segmento origen.
