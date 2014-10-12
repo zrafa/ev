@@ -1079,6 +1079,85 @@ void pendientes(double * s, double * f, int n, int dim)
 }
 
 
+void grosor(double * s, double * f, int n, int dim)
+{
+	/* x,y punto medio del segmento */
+	int cant=0, sum=0;
+	int i, j;
+	double mx, my, Mx, My, pmx, pmy;
+	double pb, pp; // desplazamiento y pendiente de la perpendicular a un punto
+	double ix, iy; // x e y de la interseccion entre las dos rectas 
+	double d; //distancia entre dos puntos
+
+	for(i=0;i<n;i++) {
+		mx = s[i*dim+0] <= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
+		Mx = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
+		my = s[i*dim+1] <= s[i*dim+3] ? s[i*dim+1] : s[i*dim+3];
+		My = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] : s[i*dim+3];
+//		printf("x1=%f,y1=%f xm=%f,ym=%f, x2=%f,y2=%f \n", s[i*dim+0], s[i*dim+1],
+//		mx+(Mx-mx)/2,
+//		my+(My-my)/2,
+//	s[i*dim+2], s[i*dim+3]);
+		pmx = mx+(Mx-mx)/2;
+		pmy = my+(My-my)/2;
+
+		/*  y = -(1/m) *x + b
+		 *  b = y - ( -(1/m) *x)
+		 *  pb es el desplayamiento de la perpendicular
+		 *  pp es la pendiente de la perpendicular
+		 */
+		// pb = my - (   ((-1) * 1/f[i*2] ) * mx  );
+		// Por ahora usamos solo el primer punto
+		pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+		pp = (-1) * 1/f[i*2] ;
+		
+		for(j=0;j<n;j++) {
+			if (j==i) continue;
+			// igualar las rectas y verificar que el punto de interseccion está dentro del segmentito
+			// Tambien podriamos verificar que el x del inicio de la perpendicular esté a la izquierda del punto que intersecta en el segmentito (la pistola deberia tomar las fotos con los pelos en vertical). Entonces siempre analizamos "perpendiculares" que van a la derecha del punto de origen.
+			  /* y = M*x + N
+			   * y2 = M2*x + N2
+   			   * N - N2 = (M2 - M) * x
+   			   * x = (N - N2) / (M2 - M)
+			   */
+			 // ix = (f[j*2+1] - pb) / (f[j*2] - pp);
+			 ix = (f[j*2+1] - pb) / (pp - f[j*2]);
+			 iy = pp * ix + pb;
+			mx = s[j*dim+0] <= s[j*dim+2] ? s[j*dim+0] : s[j*dim+2];
+			Mx = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] : s[j*dim+2];
+			my = s[j*dim+1] <= s[j*dim+3] ? s[j*dim+1] : s[j*dim+3];
+			My = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] : s[j*dim+3];
+			 if ((mx >= ix) || (Mx <= ix) )
+				continue;
+//			printf("2");
+			 if ((my >= iy) || (My <= iy) )
+				continue;
+//			printf("3");
+				
+			 if (s[i*dim+0] >= ix)
+				continue;
+//			printf("4\n");
+
+			  // distancia entre los dos puntos 
+			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+			  d = sqrt(  pow((ix - s[i*dim+0]),2) + pow((iy-s[i*dim+1]),2) );
+			  if (d<100) {
+			  	printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", s[i*dim+0], s[i*dim+1], ix, iy, s[j*dim+0], s[j*dim+1], d);
+				sum = sum + d;
+				cant++;
+			}
+
+
+
+		}
+		
+	}
+	printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant);
+
+
+}
+
+
 /*----------------------------------------------------------------------------*/
 /*                                    Main                                    */
 /*----------------------------------------------------------------------------*/
@@ -1117,6 +1196,7 @@ int main(int argc, char ** argv)
 	/* dos lugares por funcion : pendiente y desplazamiento */
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
+	grosor(segs, (double *)fcs, n, dim);
 
 
   /* output */

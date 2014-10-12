@@ -31,6 +31,12 @@
    M*x + N = M2*x +N2
    N - N2 = M2*x - M*x
    N - N2 = (M2 - M) * x
+
+- Distancia entre dos puntos
+
+   d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+
+
 Por cada "segmento" queremos ver si tiene un segmento "hermano" paralelo. 
 Entonce hacer :
   - tomar los extremos y el punto medio de este "segmento origen". Por cada uno de esos 3 puntos del segmento :
