@@ -1082,12 +1082,23 @@ void pendientes(double * s, double * f, int n, int dim)
 void grosor(double * s, double * f, int n, int dim)
 {
 	/* x,y punto medio del segmento */
-	int cant=0, sum=0;
+	int cant=1, sum=0;
 	int i, j;
 	double mx, my, Mx, My, pmx, pmy;
 	double pb, pp; // desplazamiento y pendiente de la perpendicular a un punto
 	double ix, iy; // x e y de la interseccion entre las dos rectas 
 	double d; //distancia entre dos puntos
+
+/* Creamos un archivo eps para anexar */
+  FILE * eps;
+	char *filename = "grosordelpelo.eps";
+
+  /* open file */
+  if( strcmp(filename,"-") == 0 ) eps = stdout;
+  else eps = fopen(filename,"w");
+  if( eps == NULL ) error("Error: unable to open EPS output file.");
+
+/* Fin de Creamos un archivo eps para anexar */
 
 	for(i=0;i<n;i++) {
 		mx = s[i*dim+0] <= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
@@ -1129,14 +1140,19 @@ void grosor(double * s, double * f, int n, int dim)
 			My = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] : s[j*dim+3];
 			 if ((mx >= ix) || (Mx <= ix) )
 				continue;
-//			printf("2");
 			 if ((my >= iy) || (My <= iy) )
 				continue;
-//			printf("3");
 				
 			 if (s[i*dim+0] >= ix)
 				continue;
-//			printf("4\n");
+
+			// Si no son paralelos los segmentos estimamos que los segmentos no son del mismo pelo
+			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
+			double a;
+			a= f[i*2] - f[j*2];
+			if ( (a < -0.2) || (a > 0.2) )
+				continue;
+
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
@@ -1145,6 +1161,15 @@ void grosor(double * s, double * f, int n, int dim)
 			  	printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", s[i*dim+0], s[i*dim+1], ix, iy, s[j*dim+0], s[j*dim+1], d);
 				sum = sum + d;
 				cant++;
+/* Agregamos datos al archivo grosordelpelo.eps */
+      fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+s[i*dim+0],
+               s[i*dim+1],
+               ix, 
+               iy
+                 );
+/* Fin de Agregamos datos al archivo grosordelpelo.eps */
+
 			}
 
 
@@ -1153,6 +1178,19 @@ void grosor(double * s, double * f, int n, int dim)
 		
 	}
 	printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant);
+
+
+
+
+
+/* Cerramos al archivo grosordelpelo.eps */
+  if( eps != stdout && fclose(eps) == EOF )
+    error("Error: unable to close file while writing EPS file.");
+/* Fin de Cerramos al archivo grosordelpelo.eps */
+
+
+
+
 
 
 }
