@@ -1083,8 +1083,9 @@ void grosor(double * s, double * f, int n, int dim)
 {
 	/* x,y punto medio del segmento */
 	int cant=1, sum=0;
-	int i, j;
+	int i, j, k;
 	double mx, my, Mx, My, pmx, pmy;
+	double x, y; // x e y del punto origen 
 	double pb, pp; // desplazamiento y pendiente de la perpendicular a un punto
 	double ix, iy; // x e y de la interseccion entre las dos rectas 
 	double d; //distancia entre dos puntos
@@ -1109,6 +1110,8 @@ void grosor(double * s, double * f, int n, int dim)
 //		mx+(Mx-mx)/2,
 //		my+(My-my)/2,
 //	s[i*dim+2], s[i*dim+3]);
+		
+		/* Punto medio del segmento actual */
 		pmx = mx+(Mx-mx)/2;
 		pmy = my+(My-my)/2;
 
@@ -1122,6 +1125,24 @@ void grosor(double * s, double * f, int n, int dim)
 		pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
 		pp = (-1) * 1/f[i*2] ;
 		
+		for(k=0;k<3;k++) {
+
+			/* Por cada segmento tomamos 3 puntos, inicio, medio y final */
+			switch (k) {
+			case 0: pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+				x=s[i*dim+0];
+				y=s[i*dim+1];
+				break;
+			case 1: pb = pmy - (   ((-1) * 1/f[i*2] ) * pmx  );
+				x=pmx;
+				y=pmy;
+				break;
+			case 2: pb = s[i*dim+3] - (   ((-1) * 1/f[i*2] ) * s[i*dim+2]  );
+				x=s[i*dim+2];
+				y=s[i*dim+3];
+				break;
+			}
+
 		for(j=0;j<n;j++) {
 			if (j==i) continue;
 			// igualar las rectas y verificar que el punto de interseccion está dentro del segmentito
@@ -1143,28 +1164,31 @@ void grosor(double * s, double * f, int n, int dim)
 			 if ((my >= iy) || (My <= iy) )
 				continue;
 				
-			 if (s[i*dim+0] >= ix)
+			 if (x >= ix)
 				continue;
 
 			// Si no son paralelos los segmentos estimamos que los segmentos no son del mismo pelo
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
 			double a;
 			a= f[i*2] - f[j*2];
+			/* TODO : el 0.2 tiene que ser "definible", para indicar "cuan" paralela aceptamos los segmentos opuestos */
 			if ( (a < -0.2) || (a > 0.2) )
 				continue;
 
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
-			  d = sqrt(  pow((ix - s[i*dim+0]),2) + pow((iy-s[i*dim+1]),2) );
-			  if (d<100) {
-			  	printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", s[i*dim+0], s[i*dim+1], ix, iy, s[j*dim+0], s[j*dim+1], d);
+			  d = sqrt(  pow((ix - x),2) + pow((iy-y ),2) );
+			  /* TODO : el valor 100 tiene que ser "definible" para indicar cuales "largos" se descartan */
+			  //if (d<100) {
+			  if (d<70) {
+			  	printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", x, y, ix, iy, s[j*dim+0], s[j*dim+1], d);
 				sum = sum + d;
 				cant++;
 /* Agregamos datos al archivo grosordelpelo.eps */
       fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
-s[i*dim+0],
-               s[i*dim+1],
+x,
+y,
                ix, 
                iy
                  );
@@ -1174,7 +1198,8 @@ s[i*dim+0],
 
 
 
-		}
+		}		/* del for j */
+		}		/* del for k */
 		
 	}
 	printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant);
