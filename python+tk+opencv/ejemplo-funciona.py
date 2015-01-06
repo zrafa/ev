@@ -20,31 +20,41 @@ class App(object):
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
         fileMenu = Menu(menubar, tearoff=0)
-#        fileMenu.add_command(label="Open File", command=self.fileOpen)
-#        fileMenu.add_command(label="Exit", command=self.onExit)
-        menubar.add_command(label="File", command=self.fileOpen)
+        menubar.add_command(label="Tomar Foto", command=self.tomarFoto)
+
+	# Rafa
+	self.etiqueta = Label(self.root, text="Hola")
+	self.etiqueta.pack(side=LEFT, fill=Y)
+	self.entrada = Entry(self.root)
+	self.entrada.pack(side=LEFT, fill=Y)
+	# fin Rafa
+
         self.canvas = Canvas(self.root)
-        self.canvas.pack(side=LEFT, fill=BOTH)
+        # self.canvas.pack(side=LEFT, fill=BOTH)
+        self.canvas.pack(side=BOTTOM, fill=X)
         self.scrollbar_vert = Scrollbar(self.root)
         self.scrollbar_vert.pack(side=RIGHT, fill=Y)
         self.scrollbar_hor = Scrollbar(self.root)
         self.scrollbar_hor.config(orient=HORIZONTAL)
         self.scrollbar_hor.pack(side=BOTTOM, fill=X)
 
+#	e1 = Label(self, text="First Name").grid(row=0)
+#	e2 = Label(self, text="Last Name").grid(row=1)
+
+#	e1.grid(row=0, column=1)
+#	e2.grid(row=1, column=1)
+	# e1 = Entry(self)
+	# e2 = Entry(self)
+
+	# e1.grid(row=0, column=1)
+	# e2.grid(row=1, column=1)
+
     def onExit(self):
         self.root.quit()
 
-    def fileOpen(self):
-#        filename = tkFileDialog.askopenfile(
-#                parent=self.root,
-#                mode='rb',
-#                title='Choose a file',
-#                filetypes=[ ( "Image files",("*.jpg", "*.jpeg", "*.png", "*.gif") ), ("All files", ("*.*"))] )
-#
-#        if filename == None:
-#            return
+    def tomarFoto(self):
 
-
+	# Bloque : Tomamos la foto desde la web cam y la grabamos en formato PGM
 	video_capture = cv2.VideoCapture(0)
 
 	ret, frame = video_capture.read()
@@ -61,6 +71,7 @@ class App(object):
 
 	video_capture.release()
 	cv2.destroyAllWindows()
+	# Fin de Tomamos la foto desde la web cam y la grabamos en formato PGM
 
 	filename = 'cara2.pgm'
 
