@@ -17,14 +17,25 @@ class App(object):
 
     def initUI(self):
         self.root.title(appname)
+
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
         fileMenu = Menu(menubar, tearoff=0)
         menubar.add_command(label="Tomar Foto", command=self.tomarFoto)
 
 	# Rafa
+
+	# Para expandir cuando las ventanas cambian de tamao 
+	for i in range(3):
+		self.root.columnconfigure(i, weight=1)
+	for i in range(20):
+		self.root.rowconfigure(i, weight=1)
+
 	self.etiqueta = Label(self.root, text="Hola")
-	self.etiqueta.pack(side=LEFT, fill=Y)
+	# self.etiqueta.pack(side=LEFT, fill=Y)
+	print "hola 2"
+        self.etiqueta.grid(row=1,column=1, sticky=W, pady=4, padx=5)
+
 	self.entrada = Entry(self.root)
 	self.entrada.pack(side=LEFT, fill=Y)
 	# fin Rafa
