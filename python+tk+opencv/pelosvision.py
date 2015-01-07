@@ -2,11 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Autor original del ejemplo de una aplicacion Tk: Jan Bodnar
-last modified: December 2010
-website: www.zetcode.com
-
-Modificado y ampliado para ser una GUI de GDB para MIPS. 
+PelosVision - Calcula el grosor (media) de pelos en una foto
 (C) 2014 - Rafael Ignacio Zurita <rafa@fi.uncoma.edu.ar>
 
 Lea el archivo README.md para conocer la licencia de este programa.
@@ -28,9 +24,7 @@ from ScrolledText import *
 import tkFileDialog
 import tkMessageBox
 
-class MipsxTkGui(Frame):
-  
-
+class PelosVisionTkGui(Frame):
 
     def __init__(self, parent, control):
 
@@ -86,42 +80,20 @@ class MipsxTkGui(Frame):
 	helpmenu.add_command(label="Acerca de...", command=control.acercade)
 	menu.add_command(label="Salir", command=control.salir)
 
-    def limpiar_panel(self, panel):
-		panel.delete('1.0',END)
-
-    def panel_agregar(self, panel, contenido):
-		panel.insert(END, contenido)
-
-    def panel_leer(self, panel):
-		return panel.get('1.0', END+'-1c')
-
-    def mostrar_en_area(self, area):
-		print "hola"
-
-    # Al abrir un archivo deseamos tener un area de trabajo cero
-    def limpiar_paneles(self):
-		self.mensajes.delete('1.0',END)
-		self.memoria.delete('1.0',END)
-		self.programa.delete('1.0',END)
-		self.registros.delete('1.0',END)
 
 
-
-class MipsxControl(Frame):
+class PelosVisionControl(Frame):
 
 
     def __init__(self, parent):
 
-    	self.paneles = MipsxTkGui(parent, self)
+    	self.paneles = PelosVisionTkGui(parent, self)
 
 	self.ejecucion = False
 
 	
 	# Si se finaliza el programa con click en el boton X llamamos a salir
 	root.protocol("WM_DELETE_WINDOW", self.salir)
-
-
-		
 
 		
 
@@ -134,7 +106,6 @@ class MipsxControl(Frame):
 		print "nada por hacer"
 
     def salir(self):
-
 
 		quit()
 
@@ -149,8 +120,6 @@ def main():
   
 	root.mainloop()  
 
-
-
 if __name__ == '__main__':
 	root = Tk()    
 
@@ -158,11 +127,6 @@ if __name__ == '__main__':
 	root.columnconfigure(0,weight=1)
 	root.rowconfigure(0, weight=1)
 
-    	app = MipsxControl(root)
+    	app = PelosVisionControl(root)
 	main()  
-
-
-
-
-
 
