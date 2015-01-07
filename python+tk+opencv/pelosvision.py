@@ -8,13 +8,16 @@ PelosVision - Calcula el grosor (media) de pelos en una foto
 Lea el archivo README.md para conocer la licencia de este programa.
 """
 
+import cv2
+from Tkinter import *
+from PIL import Image, ImageTk
+
 import time
 import sys
 import random
 
 from subprocess import Popen, PIPE, STDOUT
 
-from Tkinter import *
 from ttk import Frame, Button, Label, Style
 
 # Para extrar el nombre de archivo sin ruta
@@ -46,8 +49,8 @@ class PelosVisionTkGui(Frame):
         lbl = Label(self, text="Foto")
         lbl.grid(row=3,column=0, sticky=W, pady=4, padx=5)
         
-        self.registros = Text(self,height=12,width=40)
-        self.registros.grid(row=4, column=0, columnspan=1, rowspan=5, sticky=E+W+S+N)
+        self.foto1 = Canvas(self)
+        self.foto1.grid(row=4, column=0, sticky=E+W+S+N)
         
         lbl = Label(self, text="Foto 2")
         lbl.grid(row=3,column=1, sticky=W, pady=4, padx=5)
@@ -73,13 +76,23 @@ class PelosVisionTkGui(Frame):
 	root.config(menu=menu)
 	filemenu = Menu(menu)
 
-	menu.add_command(label="Tomar Foto", command=control.salir)
+	menu.add_command(label="Tomar Foto", command=control.tomarFoto)
 
 	helpmenu = Menu(menu)
 	menu.add_cascade(label="Ayuda", menu=helpmenu)
 	helpmenu.add_command(label="Acerca de...", command=control.acercade)
 	menu.add_command(label="Salir", command=control.salir)
 
+    def mostrarFoto(self,filename):
+
+	self.img = Image.open(filename)
+        resized = self.img.resize((400, 300),Image.ANTIALIAS)
+        self.photo_image = ImageTk.PhotoImage(resized)
+        self.foto1.pack_forget()
+        # self.foto1 = Canvas(self, width=self.img.size[0], height=self.img.size[1])
+        self.foto1 = Canvas(self, width=400, height=300)
+        self.foto1.create_image(10, 10, anchor=NW, image=self.photo_image)
+        self.foto1.grid(row=4, column=0, sticky=E+W+S+N)
 
 
 class PelosVisionControl(Frame):
@@ -96,6 +109,31 @@ class PelosVisionControl(Frame):
 	root.protocol("WM_DELETE_WINDOW", self.salir)
 
 		
+
+    def tomarFoto(self):
+
+	# Bloque : Tomamos la foto desde la web cam y la grabamos en formato PGM
+	video_capture = cv2.VideoCapture(0)
+
+	ret, frame = video_capture.read()
+	cv2.imshow('Video', frame)
+
+	params = list()
+	params.append(cv2.cv.CV_IMWRITE_PXM_BINARY)
+	params.append(1)
+
+	print "hola"
+	frame2 = cv2.cvtColor(frame, cv2.cv.CV_BGR2GRAY) # convert to grayscale
+	cv2.imwrite('cara2.pgm', frame2, params)
+	cv2.imwrite('cara2.PGM', frame2, params)
+
+	video_capture.release()
+	cv2.destroyAllWindows()
+	# Fin de Tomamos la foto desde la web cam y la grabamos en formato PGM
+
+	filename = 'cara2.pgm'
+
+	self.paneles.mostrarFoto(filename)
 
  
     def acercade(self):
