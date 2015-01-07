@@ -49,59 +49,37 @@ class MipsxTkGui(Frame):
 	for i in range(20):
 		self.rowconfigure(i, weight=1)
 
-        lbl = Label(self, text="Registros")
-        lbl.grid(row=1,column=2, sticky=W, pady=4, padx=5)
+        lbl = Label(self, text="Foto")
+        lbl.grid(row=3,column=0, sticky=W, pady=4, padx=5)
         
-
-        self.registros = Text(self,height=12,width=80)
-        self.registros.grid(row=2, column=2, columnspan=1, rowspan=5, 
-            sticky=E+W+S+N)
+        self.registros = Text(self,height=12,width=40)
+        self.registros.grid(row=4, column=0, columnspan=1, rowspan=5, sticky=E+W+S+N)
         
-        lbl = Label(self, text="Programa en Assembler y Prorama Binario Decodificado (disassemble) ")
-        lbl.grid(row=7, column=2, pady=1, padx=1, sticky=W+N+E+S)
+        lbl = Label(self, text="Foto 2")
+        lbl.grid(row=3,column=1, sticky=W, pady=4, padx=5)
         
-    	self.programa = Text(self, height=6,width=80)
-        self.programa.grid(row=8, column=2, columnspan=1, rowspan=5, 
-            padx=1, sticky=E+W+S+N)
+        self.foto2 = Text(self,height=12,width=40)
+	self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
+        
+        lbl = Label(self, text="Numero de la Video Camara")
+        lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
 
-        lbl = Label(self, text='Memoria - Segmento de datos (debe existir la etiqueta "memoria") - Segmento de texto - Pila')
-        lbl.grid(row=13, column=2, pady=1, padx=1, sticky=W+N+E+S)
+	self.camara = Entry(self)
+	self.camara.grid(row=2, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 
-        self.memoria = Text(self,height=15,width=80)
-        self.memoria.grid(row=14, column=2, columnspan=1, rowspan=5, 
-            padx=1, sticky=E+W+S+N)
 
-        lbl4 = Label(self, text="Mensajes de Depuracion")
-        lbl4.grid(row=13, column=0, pady=1, padx=1, sticky=W+N+E+S)
-
-        self.mensajes = Text(self,height=8,width=60)
-        self.mensajes.grid(row=14, column=0, columnspan=1, rowspan=5, 
-            padx=1, sticky=E+W+S+N)
-
-        lbl = Label(self, text="Editor del Programa")
+        lbl = Label(self, text="Limite de grosor")
         lbl.grid(row=1,column=0, sticky=W, pady=4, padx=5) 
      
-	self.editor = ScrolledText(self,height=20,width=60)
-	self.editor.grid(row=2, column=0, columnspan=1, rowspan=10, 
-            padx=1, sticky=E+W+S+N)
+	self.editor = Entry(self)
+	self.editor.grid(row=1, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
         
       
 	menu = Menu(root)
 	root.config(menu=menu)
 	filemenu = Menu(menu)
 
-	menu.add_cascade(label="Archivo", menu=filemenu)
-	filemenu.add_command(label="Nuevo", command=control.nuevo)
-	filemenu.add_command(label="Abrir...", command=control.abrir)
-	filemenu.add_command(label="Guardar...", command=control.guardar)
-	filemenu.add_separator()
-	filemenu.add_command(label="Salir", command=control.salir)
-
-
-	menu.add_command(label="Run", command=control.ejecutar)
-	menu.add_command(label="Next", command=control.prox_instruccion)
-	menu.add_command(label="Breakpoint", command=control.no_hacer_nada)
-	menu.add_command(label="Compilar y Cargar", command=control.compilarycargar)
+	menu.add_command(label="Tomar Foto", command=control.ejecutar)
 
 	helpmenu = Menu(menu)
 	menu.add_cascade(label="Ayuda", menu=helpmenu)

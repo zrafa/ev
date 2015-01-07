@@ -34,10 +34,10 @@ class App(object):
 	self.etiqueta = Label(self.root, text="Hola")
 	# self.etiqueta.pack(side=LEFT, fill=Y)
 	print "hola 2"
-        self.etiqueta.grid(row=1,column=1, sticky=W, pady=4, padx=5)
+        # self.etiqueta.grid(row=1,column=1, sticky=W, pady=4, padx=5)
 
-	self.entrada = Entry(self.root)
-	self.entrada.pack(side=LEFT, fill=Y)
+	# self.entrada = Entry(self.root)
+	# self.entrada.pack(side=LEFT, fill=Y)
 	# fin Rafa
 
         self.canvas = Canvas(self.root)
