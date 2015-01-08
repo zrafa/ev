@@ -1212,7 +1212,7 @@ x,
 		
 	}
 	/* printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant); */
-	printf("%i\n", sum/cant);
+	printf("Grosor del PELO en pixels : %i\n", sum/cant);
 
 
 
