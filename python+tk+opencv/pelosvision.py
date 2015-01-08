@@ -55,8 +55,8 @@ class PelosVisionTkGui(Frame):
         lbl = Label(self, text="Foto 2")
         lbl.grid(row=3,column=1, sticky=W, pady=4, padx=5)
         
-        self.foto2 = Text(self,height=12,width=40)
-	self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
+        self.foto2 = Canvas(self)
+        self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
         
         lbl = Label(self, text="Numero de la Video Camara")
         lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
@@ -96,10 +96,24 @@ class PelosVisionTkGui(Frame):
 
     def calcularGrosor(self,filename):
 		print "calcular"
+		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
+		output = Popen(["../lsd_1.6/lsd", "-P", "salida.eps", "Pelo40X.pgm", "salida.txt"], stdout=PIPE).communicate()[0]
+		output = output.replace('Grosor del PELO en pixels : ', '')
+		print output
+
     def mostrarFoto2(self,filename):
 		print "mostrar 2"
 		# Hay que ejecutar para hacer merge de los EPS generados :
 		# convert salida.ps grosordelpelo.eps -layers merge salida2.png
+		output = Popen(["convert", "salida.eps", "grosordelpelo.eps", "-layers", "merge", "salida2.png"], stdout=PIPE).communicate()[0]
+		self.img2 = Image.open("salida2.png")
+        	resized2 = self.img2.resize((400, 300),Image.ANTIALIAS)
+        	self.photo_image2 = ImageTk.PhotoImage(resized2)
+        	self.foto2.pack_forget()
+        	self.foto2 = Canvas(self, width=400, height=300)
+        	self.foto2.create_image(10, 10, anchor=NW, image=self.photo_image2)
+        	self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
+
 
 class PelosVisionControl(Frame):
 
