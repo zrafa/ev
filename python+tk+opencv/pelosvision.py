@@ -97,7 +97,7 @@ class PelosVisionTkGui(Frame):
     def calcularGrosor(self,filename):
 		print "calcular"
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
-		output = Popen(["../lsd_1.6/lsd", "-P", "salida.eps", "Pelo40X.pgm", "salida.txt"], stdout=PIPE).communicate()[0]
+		output = Popen(["../lsd_1.6/lsd", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		print output
 
