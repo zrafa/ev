@@ -1186,10 +1186,12 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize)
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
 			  d = sqrt(  pow((ix - x),2) + pow((iy-y ),2) );
-			  /* TODO : el valor 100 tiene que ser "definible" para indicar cuales "largos" se descartan */
+			  /* TODO : el valor 100 o 70 tiene que ser "definible" para indicar cuales "largos" se descartan */
 			  //if (d<100) {
 			  if (d<70) {
-			  	printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", x, y, ix, iy, s[j*dim+0], s[j*dim+1], d);
+				/* Mostramos el segmento y distancia
+			  	 * printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", x, y, ix, iy, s[j*dim+0], s[j*dim+1], d);
+				 */
 				sum = sum + d;
 				cant++;
 /* Agregamos datos al archivo grosordelpelo.eps */
@@ -1209,7 +1211,8 @@ x,
 		}		/* del for k */
 		
 	}
-	printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant);
+	/* printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant); */
+	printf("%i\n", sum/cant);
 
 
 
