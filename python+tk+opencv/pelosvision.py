@@ -98,6 +98,8 @@ class PelosVisionTkGui(Frame):
 		print "calcular"
     def mostrarFoto2(self,filename):
 		print "mostrar 2"
+		# Hay que ejecutar para hacer merge de los EPS generados :
+		# convert salida.ps grosordelpelo.eps -layers merge salida2.png
 
 class PelosVisionControl(Frame):
 
