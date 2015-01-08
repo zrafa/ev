@@ -94,6 +94,10 @@ class PelosVisionTkGui(Frame):
         self.foto1.create_image(10, 10, anchor=NW, image=self.photo_image)
         self.foto1.grid(row=4, column=0, sticky=E+W+S+N)
 
+    def calcularGrosor(self,filename):
+		print "calcular"
+    def mostrarFoto2(self,filename):
+		print "mostrar 2"
 
 class PelosVisionControl(Frame):
 
@@ -134,6 +138,8 @@ class PelosVisionControl(Frame):
 	filename = 'cara2.pgm'
 
 	self.paneles.mostrarFoto(filename)
+	self.paneles.calcularGrosor(filename)
+	self.paneles.mostrarFoto2(filename)
 
  
     def acercade(self):
