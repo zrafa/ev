@@ -1079,7 +1079,7 @@ void pendientes(double * s, double * f, int n, int dim)
 }
 
 
-void grosor(double * s, double * f, int n, int dim)
+void grosor(double * s, double * f, int n, int dim, int xsize, int ysize)
 {
 	/* x,y punto medio del segmento */
 	int cant=1, sum=0;
@@ -1098,6 +1098,13 @@ void grosor(double * s, double * f, int n, int dim)
   if( strcmp(filename,"-") == 0 ) eps = stdout;
   else eps = fopen(filename,"w");
   if( eps == NULL ) error("Error: unable to open EPS output file.");
+
+  /* write EPS header */
+  fprintf(eps,"%%!PS-Adobe-3.0 EPSF-3.0\n");
+  fprintf(eps,"%%%%BoundingBox: 0 0 %d %d\n",xsize,ysize);
+  fprintf(eps,"%%%%Creator: LSD, Line Segment Detector\n");
+  fprintf(eps,"%%%%Title: (%s)\n",filename);
+  fprintf(eps,"%%%%EndComments\n");
 
 /* Fin de Creamos un archivo eps para anexar */
 
@@ -1188,9 +1195,9 @@ void grosor(double * s, double * f, int n, int dim)
 /* Agregamos datos al archivo grosordelpelo.eps */
       fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
 x,
-y,
+(double) ysize - y,
                ix, 
-               iy
+(double) ysize - iy
                  );
 /* Fin de Agregamos datos al archivo grosordelpelo.eps */
 
@@ -1209,6 +1216,8 @@ y,
 
 
 /* Cerramos al archivo grosordelpelo.eps */
+  fprintf(eps,"showpage\n");
+  fprintf(eps,"%%%%EOF\n");
   if( eps != stdout && fclose(eps) == EOF )
     error("Error: unable to close file while writing EPS file.");
 /* Fin de Cerramos al archivo grosordelpelo.eps */
@@ -1254,12 +1263,13 @@ int main(int argc, char ** argv)
                                is_assigned(arg,"reg") ? &region : NULL,
                                &regX, &regY );
 
-  double fcs[n][2];
 	/* Creamos el arreglo de funciones */
 	/* dos lugares por funcion : pendiente y desplazamiento */
+  	double fcs[n][2];
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
-	grosor(segs, (double *)fcs, n, dim);
+	grosor(segs, (double *)fcs, n, dim, X, Y);
+    // write_eps(segs,n,dim,get_str(arg,"epsfile"),X,Y,get_double(arg,"width"));
 
 
   /* output */
