@@ -24,20 +24,11 @@ class App(object):
         menubar.add_command(label="Tomar Foto", command=self.tomarFoto)
 
 	# Rafa
-
-	# Para expandir cuando las ventanas cambian de tamao 
 	for i in range(3):
 		self.root.columnconfigure(i, weight=1)
 	for i in range(20):
 		self.root.rowconfigure(i, weight=1)
-
 	self.etiqueta = Label(self.root, text="Hola")
-	# self.etiqueta.pack(side=LEFT, fill=Y)
-	print "hola 2"
-        # self.etiqueta.grid(row=1,column=1, sticky=W, pady=4, padx=5)
-
-	# self.entrada = Entry(self.root)
-	# self.entrada.pack(side=LEFT, fill=Y)
 	# fin Rafa
 
         self.canvas = Canvas(self.root)
@@ -48,17 +39,6 @@ class App(object):
         self.scrollbar_hor = Scrollbar(self.root)
         self.scrollbar_hor.config(orient=HORIZONTAL)
         self.scrollbar_hor.pack(side=BOTTOM, fill=X)
-
-#	e1 = Label(self, text="First Name").grid(row=0)
-#	e2 = Label(self, text="Last Name").grid(row=1)
-
-#	e1.grid(row=0, column=1)
-#	e2.grid(row=1, column=1)
-	# e1 = Entry(self)
-	# e2 = Entry(self)
-
-	# e1.grid(row=0, column=1)
-	# e2.grid(row=1, column=1)
 
     def onExit(self):
         self.root.quit()
