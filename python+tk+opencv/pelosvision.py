@@ -26,6 +26,7 @@ import ntpath
 from ScrolledText import *
 import tkFileDialog
 import tkMessageBox
+import ttk
 
 class PelosVisionTkGui(Frame):
 
@@ -46,37 +47,60 @@ class PelosVisionTkGui(Frame):
 	for i in range(20):
 		self.rowconfigure(i, weight=1)
 
-        lbl = Label(self, text="Foto")
-        lbl.grid(row=3,column=0, sticky=W, pady=4, padx=5)
+        lbl = Label(self, text="Limite de grosor máximo (en pixels)")
+        lbl.grid(row=1,column=0, sticky=W, pady=4, padx=5) 
+
+	self.limite = Entry(self)
+	self.limite.grid(row=1, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.limite.delete(0, END)
+	self.limite.insert(0, "70")
+
+        lbl = Label(self, text="Grosor obtenido (en pixels)")
+        lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
+	self.grosor = Entry(self)
+	self.grosor.grid(row=2, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
         
+        lbl = Label(self, text="Grosor obtenido (en micrones)")
+        lbl.grid(row=3,column=0, sticky=W, pady=1, padx=5) 
+	self.grosormicron = Entry(self)
+	self.grosormicron.grid(row=3, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+       
+	lbl = ttk.Separator(self,orient=HORIZONTAL).grid(row=4, columnspan=2, sticky="ew")
+
+        lbl = Label(self, text="Foto")
+        lbl.grid(row=5,column=0, sticky=W, pady=4, padx=5)
         self.foto1 = Canvas(self)
-        self.foto1.grid(row=4, column=0, sticky=E+W+S+N)
+        self.foto1.grid(row=6, column=0, sticky=E+W+S+N)
         
         lbl = Label(self, text="Foto 2")
-        lbl.grid(row=3,column=1, sticky=W, pady=4, padx=5)
-        
+        lbl.grid(row=5,column=1, sticky=W, pady=4, padx=5)
         self.foto2 = Canvas(self)
-        self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
+        self.foto2.grid(row=6, column=1, sticky=E+W+S+N)
         
+	lbl = ttk.Separator(self,orient=HORIZONTAL).grid(row=7, columnspan=2, sticky="ew")
+
+        lbl = Label(self, text="Opciones Avanzadas : ")
+        lbl.grid(row=8,column=0, sticky=W, pady=1, padx=5) 
+
         lbl = Label(self, text="Numero de la Video Camara")
-        lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
-
+        lbl.grid(row=9,column=0, sticky=W, pady=1, padx=5) 
 	self.camara = Entry(self)
-	self.camara.grid(row=2, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.camara.grid(row=9, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.camara.delete(0, END)
+	self.camara.insert(0, "0")
 
+        lbl = Label(self, text="Calibracion 1 pixel = (micrones)")
+        lbl.grid(row=10,column=0, sticky=W, pady=1, padx=5) 
+	self.micron = Entry(self)
+	self.micron.grid(row=10, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.micron.delete(0, END)
+	self.micron.insert(0, "0.5")
 
-        lbl = Label(self, text="Limite de grosor")
-        lbl.grid(row=1,column=0, sticky=W, pady=4, padx=5) 
-     
-	self.editor = Entry(self)
-	self.editor.grid(row=1, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
-        
-      
 	menu = Menu(root)
 	root.config(menu=menu)
 	filemenu = Menu(menu)
 
-	menu.add_command(label="Tomar Foto", command=control.tomarFoto)
+	menu.add_command(label="    Tomar Foto    ", command=control.tomarFoto)
 
 	helpmenu = Menu(menu)
 	menu.add_cascade(label="Ayuda", menu=helpmenu)
@@ -92,13 +116,17 @@ class PelosVisionTkGui(Frame):
         # self.foto1 = Canvas(self, width=self.img.size[0], height=self.img.size[1])
         self.foto1 = Canvas(self, width=400, height=300)
         self.foto1.create_image(10, 10, anchor=NW, image=self.photo_image)
-        self.foto1.grid(row=4, column=0, sticky=E+W+S+N)
+        self.foto1.grid(row=6, column=0, sticky=E+W+S+N)
 
     def calcularGrosor(self,filename):
 		print "calcular"
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
 		output = Popen(["../lsd_1.6/lsd", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
+		self.grosor.delete(0, END)
+		self.grosor.insert(0, output)
+		self.grosormicron.delete(0, END)
+		self.grosormicron.insert(0, float(output)*float(self.micron.get()))
 		print output
 
     def mostrarFoto2(self,filename):
@@ -106,13 +134,14 @@ class PelosVisionTkGui(Frame):
 		# Hay que ejecutar para hacer merge de los EPS generados :
 		# convert salida.ps grosordelpelo.eps -layers merge salida2.png
 		output = Popen(["convert", "salida.eps", "grosordelpelo.eps", "-layers", "merge", "salida2.png"], stdout=PIPE).communicate()[0]
+		# Mostramos la foto 2
 		self.img2 = Image.open("salida2.png")
         	resized2 = self.img2.resize((400, 300),Image.ANTIALIAS)
         	self.photo_image2 = ImageTk.PhotoImage(resized2)
         	self.foto2.pack_forget()
         	self.foto2 = Canvas(self, width=400, height=300)
         	self.foto2.create_image(10, 10, anchor=NW, image=self.photo_image2)
-        	self.foto2.grid(row=4, column=1, sticky=E+W+S+N)
+        	self.foto2.grid(row=6, column=1, sticky=E+W+S+N)
 
 
 class PelosVisionControl(Frame):
@@ -133,7 +162,8 @@ class PelosVisionControl(Frame):
     def tomarFoto(self):
 
 	# Bloque : Tomamos la foto desde la web cam y la grabamos en formato PGM
-	video_capture = cv2.VideoCapture(0)
+	# video_capture = cv2.VideoCapture(0)
+	video_capture = cv2.VideoCapture(int(self.paneles.camara.get()))
 
 	ret, frame = video_capture.read()
 	cv2.imshow('Video', frame)
