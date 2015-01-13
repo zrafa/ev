@@ -72,7 +72,7 @@ class PelosVisionTkGui(Frame):
         self.foto1 = Canvas(self)
         self.foto1.grid(row=6, column=0, sticky=E+W+S+N)
         
-        lbl = Label(self, text="Foto 2")
+        lbl = Label(self, text="Representacion del Analisis")
         lbl.grid(row=5,column=1, sticky=W, pady=4, padx=5)
         self.foto2 = Canvas(self)
         self.foto2.grid(row=6, column=1, sticky=E+W+S+N)
