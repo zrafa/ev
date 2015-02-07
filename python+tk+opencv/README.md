@@ -9,6 +9,7 @@ python-opencv
 python-tk
 python-pil
 python-pil.imagetk
+build-essential
 ` ` ` 
 
 Compilar lsd con make all
