@@ -107,6 +107,7 @@ class PelosVisionTkGui(Frame):
 	helpmenu.add_command(label="Acerca de...", command=control.acercade)
 	menu.add_command(label="Salir", command=control.salir)
 
+
     def mostrarFoto(self,filename):
 
 	self.img = Image.open(filename)
@@ -119,7 +120,6 @@ class PelosVisionTkGui(Frame):
         self.foto1.grid(row=6, column=0, sticky=E+W+S+N)
 
     def calcularGrosor(self,filename):
-		print "calcular"
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
 		output = Popen(["../lsd_1.6/lsd", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
@@ -130,7 +130,6 @@ class PelosVisionTkGui(Frame):
 		print output
 
     def mostrarFoto2(self,filename):
-		print "mostrar 2"
 		# Hay que ejecutar para hacer merge de los EPS generados :
 		# convert salida.ps grosordelpelo.eps -layers merge salida2.png
 		output = Popen(["convert", "salida.eps", "grosordelpelo.eps", "-layers", "merge", "salida2.png"], stdout=PIPE).communicate()[0]
@@ -165,14 +164,33 @@ class PelosVisionControl(Frame):
 	# video_capture = cv2.VideoCapture(0)
 	video_capture = cv2.VideoCapture(int(self.paneles.camara.get()))
 
+	#cap = cv2.VideoCapture(0)
+
+	while(True):
+	    # Capture frame-by-frame
+	    ret, frame = video_capture.read()
+
+	    # Our operations on the frame come here
+	    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+	    # Display the resulting frame
+	    cv2.imshow('Video de enfoque y disparo - presione la tecla "s" para tomar una foto',gray)
+	    if cv2.waitKey(1) & 0xFF == ord('s'):
+	    	ret, frame = video_capture.read()
+       		break
+
+	# When everything done, release the capture
+	# cap.release()
+	# cv2.destroyAllWindows()
+	cv2.destroyWindow('Video de enfoque y disparo - presione la tecla "s" para tomar una foto')
+
 	ret, frame = video_capture.read()
-	cv2.imshow('Video', frame)
+	#cv2.imshow('Video', frame)
 
 	params = list()
 	params.append(cv2.cv.CV_IMWRITE_PXM_BINARY)
 	params.append(1)
 
-	print "hola"
 	frame2 = cv2.cvtColor(frame, cv2.cv.CV_BGR2GRAY) # convert to grayscale
 	cv2.imwrite('cara2.pgm', frame2, params)
 	cv2.imwrite('cara2.PGM', frame2, params)
@@ -219,4 +237,5 @@ if __name__ == '__main__':
 
     	app = PelosVisionControl(root)
 	main()  
+
 
