@@ -96,11 +96,19 @@ class PelosVisionTkGui(Frame):
 	self.micron.delete(0, END)
 	self.micron.insert(0, "0.5")
 
+        lbl = Label(self, text="Valor deseado en la Secuencia de Fotos")
+        lbl.grid(row=11,column=0, sticky=W, pady=1, padx=5) 
+	self.secuencia = Entry(self)
+	self.secuencia.grid(row=11, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.secuencia.delete(0, END)
+	self.secuencia.insert(0, "1")
+
 	menu = Menu(root)
 	root.config(menu=menu)
 	filemenu = Menu(menu)
 
-	menu.add_command(label="    Tomar Foto    ", command=control.tomarFoto)
+	menu.add_command(label="    Tomar Foto    ", command=control.tomarFotoConPrevia)
+	menu.add_command(label="    Tomar Secuencia de Fotos    ", command=control.tomarSecuencia)
 
 	helpmenu = Menu(menu)
 	menu.add_cascade(label="Ayuda", menu=helpmenu)
@@ -158,7 +166,21 @@ class PelosVisionControl(Frame):
 
 		
 
-    def tomarFoto(self):
+    def tomarSecuencia(self):
+	media_general = 0
+	for i in range(int(self.paneles.secuencia.get())):
+		self.tomarFoto(False)
+		media_general = media_general + int(self.paneles.grosor.get())
+
+	media_general = media_general / int(self.paneles.secuencia.get())
+	self.paneles.grosor.delete(0, END)
+	self.paneles.grosor.insert(0, media_general)
+
+
+    def tomarFotoConPrevia(self):
+	self.tomarFoto(True)
+
+    def tomarFoto(self, previa):
 
 	# Bloque : Tomamos la foto desde la web cam y la grabamos en formato PGM
 	# video_capture = cv2.VideoCapture(0)
@@ -166,7 +188,7 @@ class PelosVisionControl(Frame):
 
 	#cap = cv2.VideoCapture(0)
 
-	while(True):
+	while(previa):
 	    # Capture frame-by-frame
 	    ret, frame = video_capture.read()
 
