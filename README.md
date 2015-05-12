@@ -5,7 +5,7 @@ Este proyecto de I+D reune los temas visión embebida en una aplicación
 para calcular el grosor de pelos en micrones.
 
 
-<img src="https://github.com/zrafa/ev/con-camara-y-pelos.jpg?raw=true" alt="simm ram and atmega328p" width="500" height="400">
+<img src="https://raw.githubusercontent.com/zrafa/ev/master/con-camara-y-pelos.jpg" alt="simm ram and atmega328p" width="500" height="400">
 
 
 Estado: Utilizamos un programa llamado lsd. Con el programa lsd obtenemos los bordes del pelo en "segmentitos".
