@@ -103,6 +103,13 @@ class PelosVisionTkGui(Frame):
 	self.secuencia.delete(0, END)
 	self.secuencia.insert(0, "1")
 
+        lbl = Label(self, text="Valor minimo de grosor de pelo (en micrones)")
+        lbl.grid(row=12,column=0, sticky=W, pady=1, padx=5) 
+	self.minimo = Entry(self)
+	self.minimo.grid(row=12, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.minimo.delete(0, END)
+	self.minimo.insert(0, "10")
+
 	menu = Menu(root)
 	root.config(menu=menu)
 	filemenu = Menu(menu)
@@ -129,7 +136,8 @@ class PelosVisionTkGui(Frame):
 
     def calcularGrosor(self,filename):
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
-		output = Popen(["../lsd_1.6/lsd", "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
+		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
+		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		self.grosor.delete(0, END)
 		self.grosor.insert(0, output)
@@ -164,7 +172,6 @@ class PelosVisionControl(Frame):
 	# Si se finaliza el programa con click en el boton X llamamos a salir
 	root.protocol("WM_DELETE_WINDOW", self.salir)
 
-		
 
     def tomarSecuencia(self):
 	media_general = 0

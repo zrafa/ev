@@ -47,6 +47,8 @@
       Minimal density of region points in a rectangle to be accepted.          \
 #opt: cota_superior | t | int | 1 | 1 | |                                             \
       Valor de cota superior de grosor permitido en pixels.               \
+#opt: cota_inferior | T | int | 1 | 1 | |                                             \
+      Valor de cota inferior de grosor permitido en pixels.               \
 #opt: n_bins | b | int | 1024 | 1 | |                                          \
       Number of bins in 'ordering' of gradient modulus.                        \
 #opt: reg | R | str | | | |                                                    \
@@ -1081,7 +1083,7 @@ void pendientes(double * s, double * f, int n, int dim)
 }
 
 
-void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior)
+void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior)
 {
 	/* x,y punto medio del segmento */
 	int cant=1, sum=0;
@@ -1189,7 +1191,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
 			  d = sqrt(  pow((ix - x),2) + pow((iy-y ),2) );
 			  /* TODO : el valor 100 o 70 tiene que ser "definible" para indicar cuales "largos" se descartan */
-			  if (d < cota_superior) {
+			  if ((d < cota_superior) && (d > cota_inferior)) {
 				/* Mostramos el segmento y distancia
 			  	 * printf("x1=%f, y1=%f, x2=%f, y2=%f, xj=%f, yj=%f . Distancia Pixels : %f\n", x, y, ix, iy, s[j*dim+0], s[j*dim+1], d);
 				 */
@@ -1254,6 +1256,7 @@ int main(int argc, char ** argv)
 
   /* argumento agregado por rafa para obtener la cota superior del grosor maximo permitido */
   int cota_superior = get_int(arg,"cota_superior");
+  int cota_inferior = get_int(arg,"cota_inferior");
 
   /* read input file */
   image = read_pgm_image_double(&X,&Y,get_str(arg,"in"));
@@ -1275,7 +1278,7 @@ int main(int argc, char ** argv)
   	double fcs[n][2];
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
-	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior);
+	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior);
     // write_eps(segs,n,dim,get_str(arg,"epsfile"),X,Y,get_double(arg,"width"));
 
 
