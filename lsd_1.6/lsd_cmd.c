@@ -1126,6 +1126,12 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		pmx = mx+(Mx-mx)/2;
 		pmy = my+(My-my)/2;
 
+		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
+		// distancia entre los dos puntos 
+		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
+		if (d < cota_inferior) continue;
+
 		/*  y = -(1/m) *x + b
 		 *  b = y - ( -(1/m) *x)
 		 *  pb es el desplayamiento de la perpendicular
@@ -1170,6 +1176,15 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			Mx = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] : s[j*dim+2];
 			my = s[j*dim+1] <= s[j*dim+3] ? s[j*dim+1] : s[j*dim+3];
 			My = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] : s[j*dim+3];
+
+		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
+		// distancia entre los dos puntos 
+		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
+		if (d < cota_inferior) continue;
+
+
+
 			 if ((mx >= ix) || (Mx <= ix) )
 				continue;
 			 if ((my >= iy) || (My <= iy) )
