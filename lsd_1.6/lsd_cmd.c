@@ -1083,10 +1083,11 @@ void pendientes(double * s, double * f, int n, int dim)
 }
 
 
-int intersecta(double x, double y, double ix, double iy, int i, int j, double pb, double pp, int n, double * f) {
+int intersecta(double x, double y, double ix, double iy, int i, int j, double pb, double pp, int n, double * f, double * s, int dim) {
 	int k;
 	double jx, jy; /* x e y de la interseccion entre el segmento de entrada y un segmento de s[] fp[] */
 	double mx, Mx, my, My;
+	double mox, Mox, moy, Moy;
 
 	for(k=0;k<n;k++) {
 		if (k==i) continue;
@@ -1100,6 +1101,10 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 		my = y <= iy ? y : iy;
 		My = y >= iy ? y : iy;
 
+		mox = s[k*dim+0] <= s[k*dim+2] ? s[k*dim+0] : s[k*dim+2];
+		Mox = s[k*dim+0] >= s[k*dim+2] ? s[k*dim+0] : s[k*dim+2];
+		moy = s[k*dim+1] <= s[k*dim+3] ? s[k*dim+1] : s[k*dim+3];
+		Moy = s[k*dim+1] >= s[k*dim+3] ? s[k*dim+1] : s[k*dim+3];
 /*
 			 if ((mx >= jx) || (Mx <= jx) )
 				continue;
@@ -1109,7 +1114,8 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 				return 1;
 */
 
-		if ( (mx <= jx) && (jx <= Mx) && (my <= jy) && (jy <=My))
+		if ( (mx <= jx) && (jx <= Mx) && (my <= jy) && (jy <=My) && \
+		   (mox <= jx) && (jx <= Mox) && (moy <= jy) && (jy <=Moy))
 				return 1;
 				
 		//	 if (x >= ix)
@@ -1233,15 +1239,15 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
 			double a;
 			a= f[i*2] - f[j*2];
-			/* TODO : el 0.2 tiene que ser "definible", para indicar "cuan" paralela aceptamos los segmentos opuestos */
-			if ( (a < -0.2) || (a > 0.2) )
+			/* TODO : el 0.1 tiene que ser "definible", para indicar "cuan" paralela aceptamos los segmentos opuestos */
+			if ( (a < -0.1) || (a > 0.1) )
 				continue;
 
 
 			/* Si la perpendicular intersecta algun otro segmento entonces 
 			 * es una perpendicular confusa, con ruido 
 			 */
-			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f) )
+			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) )
 				continue;
 
 			  // distancia entre los dos puntos 
