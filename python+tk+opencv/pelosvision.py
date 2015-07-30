@@ -136,8 +136,8 @@ class PelosVisionTkGui(Frame):
 
     def calcularGrosor(self,filename):
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
-		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
-		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
+		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
+		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		self.grosor.delete(0, END)
 		self.grosor.insert(0, output)
@@ -172,6 +172,13 @@ class PelosVisionControl(Frame):
 	# Si se finaliza el programa con click en el boton X llamamos a salir
 	root.protocol("WM_DELETE_WINDOW", self.salir)
 
+	filename = 'unpelo.pgm'
+
+	self.paneles.mostrarFoto(filename)
+	self.paneles.calcularGrosor(filename)
+	self.paneles.mostrarFoto2(filename)
+
+		
 
     def tomarSecuencia(self):
 	media_general = 0

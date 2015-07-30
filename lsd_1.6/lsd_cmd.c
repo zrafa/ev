@@ -1083,6 +1083,42 @@ void pendientes(double * s, double * f, int n, int dim)
 }
 
 
+int intersecta(double x, double y, double ix, double iy, int i, int j, double pb, double pp, int n, double * f) {
+	int k;
+	double jx, jy; /* x e y de la interseccion entre el segmento de entrada y un segmento de s[] fp[] */
+	double mx, Mx, my, My;
+
+	for(k=0;k<n;k++) {
+		if (k==i) continue;
+		if (k==j) continue;
+
+		// igualar las rectas y verificar que el punto de interseccion está dentro del segmentito
+		jx = (f[k*2+1] - pb) / (pp - f[k*2]);
+		jy = pp * jx + pb;
+		mx = x <= ix ? x : ix;
+		Mx = x >= ix ? x : ix; 
+		my = y <= iy ? y : iy;
+		My = y >= iy ? y : iy;
+
+/*
+			 if ((mx >= jx) || (Mx <= jx) )
+				continue;
+			 else if ((my >= jy) || (My <= jy) )
+				continue;
+			 else 
+				return 1;
+*/
+
+		if ( (mx <= jx) && (jx <= Mx) && (my <= jy) && (jy <=My))
+				return 1;
+				
+		//	 if (x >= ix)
+		//		continue;
+	}
+	return 0; /* No hubo interseccion con ninguna recta */
+
+}
+
 void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior)
 {
 	/* x,y punto medio del segmento */
@@ -1201,6 +1237,12 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			if ( (a < -0.2) || (a > 0.2) )
 				continue;
 
+
+			/* Si la perpendicular intersecta algun otro segmento entonces 
+			 * es una perpendicular confusa, con ruido 
+			 */
+			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f) )
+				continue;
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
