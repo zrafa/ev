@@ -94,7 +94,7 @@ class PelosVisionTkGui(Frame):
 	self.micron = Entry(self)
 	self.micron.grid(row=10, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.micron.delete(0, END)
-	self.micron.insert(0, "0.5")
+	self.micron.insert(0, "1")
 
         lbl = Label(self, text="Valor deseado en la Secuencia de Fotos")
         lbl.grid(row=11,column=0, sticky=W, pady=1, padx=5) 
@@ -108,7 +108,7 @@ class PelosVisionTkGui(Frame):
 	self.minimo = Entry(self)
 	self.minimo.grid(row=12, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.minimo.delete(0, END)
-	self.minimo.insert(0, "10")
+	self.minimo.insert(0, "15")
 
 	menu = Menu(root)
 	root.config(menu=menu)
@@ -138,6 +138,7 @@ class PelosVisionTkGui(Frame):
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
 		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
+		output2 = Popen(["cat", "salida.txt"], ).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		self.grosor.delete(0, END)
 		self.grosor.insert(0, output)
@@ -178,6 +179,24 @@ class PelosVisionControl(Frame):
 	self.paneles.calcularGrosor(filename)
 	self.paneles.mostrarFoto2(filename)
 
+    def key(self, event):
+        print "pressed", repr(event.char)
+        if event.keysym == '1':
+                self.tomarFoto(True)
+        elif event.keysym == '3':
+                cam = self.paneles.camara.get()
+                self.paneles.camara.delete(0, END)
+                if cam == "0":
+                        self.paneles.camara.insert(0, "1")
+                elif cam == "1":
+                        self.paneles.camara.insert(0, "2")
+                else:
+                        self.paneles.camara.insert(0, "0")
+
+        elif event.keysym == '4':
+                quit()
+
+
 		
 
     def tomarSecuencia(self):
@@ -202,6 +221,7 @@ class PelosVisionControl(Frame):
 
 	#cap = cv2.VideoCapture(0)
 
+        enfocado = False
 	while(previa):
 	    # Capture frame-by-frame
 	    ret, frame = video_capture.read()
@@ -210,15 +230,20 @@ class PelosVisionControl(Frame):
 	    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
 	    # Display the resulting frame
-	    cv2.imshow('Video de enfoque y disparo - presione la tecla "s" para tomar una foto',gray)
-	    if cv2.waitKey(1) & 0xFF == ord('s'):
+	    cv2.imshow('Video de enfoque y disparo - presione la tecla "7" para tomar una foto',gray)
+            if not enfocado:
+                if cv2.waitKey(5):
+                        salida = Popen(["./fw.sh"], stdout=PIPE).communicate()[0]
+                        enfocado = True
+
+	    if cv2.waitKey(1) & 0xFF == ord('7'):
 	    	ret, frame = video_capture.read()
        		break
 
 	# When everything done, release the capture
 	# cap.release()
 	# cv2.destroyAllWindows()
-	cv2.destroyWindow('Video de enfoque y disparo - presione la tecla "s" para tomar una foto')
+	cv2.destroyWindow('Video de enfoque y disparo - presione la tecla "7" para tomar una foto')
 
 	ret, frame = video_capture.read()
 	#cv2.imshow('Video', frame)
@@ -240,6 +265,7 @@ class PelosVisionControl(Frame):
 	self.paneles.mostrarFoto(filename)
 	self.paneles.calcularGrosor(filename)
 	self.paneles.mostrarFoto2(filename)
+        salida = Popen(["./mw.sh"], stdout=PIPE).communicate()[0]
 
  
     def acercade(self):
@@ -272,6 +298,7 @@ if __name__ == '__main__':
 	root.rowconfigure(0, weight=1)
 
     	app = PelosVisionControl(root)
+	root.bind_all('<Key>', app.key)
 	main()  
 
 
