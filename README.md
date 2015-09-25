@@ -56,7 +56,7 @@ Este es un prototipo para "imitar" el comportamiento del wool view.
 
 Requisitos - Instalar :
 ```
-apt-get install imagemagick python-opencv python-tk python-pil python-pil.imagetk build-essential
+apt-get install imagemagick python-opencv python-tk python-pil python-pil.imagetk build-essential xdotool
 ```
 
 Como Testear el código
