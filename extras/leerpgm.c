@@ -36,6 +36,7 @@ void main (void) {
 
 	f=open("cara2.pgm", O_RDONLY);
 	n = read(f, &c, 1);
+	printf("%i ", c);
 	while (n != 0) {
 		ca = c;
 		n = read(f, &c, 1);
@@ -52,12 +53,12 @@ void main (void) {
 			printf("FILA=%i\n",fila);
 		}
 // if (c>200) {
-if (((c-ca)>25) || ((ca-c)>25)) {
+if (((c-ca)>15) || ((ca-c)>15)) {
 /* Agregamos datos al archivo grosordelpelo.eps */
-      fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+      fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 1  setlinewidth stroke\n",
 (double) col,
 (double) 480-fila,
-               (double) col+1,
+               (double) col+0.1,
 (double) 480-fila
                  );
 /* Fin de Agregamos datos al archivo grosordelpelo.eps */
