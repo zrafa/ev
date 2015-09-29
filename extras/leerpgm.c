@@ -4,47 +4,42 @@
 #include <stdio.h>
 #include <ctype.h>
 
+
 void cabecera_pgm(int f, int fout) {
 	
 	unsigned char c = 0;
 	int n = 0;
+	int i = 0;
 
+	/* La cabecera de un pgm tiene este formato 
+	 *
+	 * Fuente : http://netpbm.sourceforge.net/doc/pgm.html
+	 * A "magic number" for identifying the file type. A pgm image's magic number is the two characters "P5".
+	 * Whitespace (blanks, TABs, CRs, LFs).
+	 * A width, formatted as ASCII characters in decimal.
+	 * Whitespace.
+	 * A height, again in ASCII decimal.
+	 * Whitespace.
+	 * The maximum gray value (Maxval), again in ASCII decimal. Must be less than 65536, and more than zero.
+	 * A single whitespace character (usually a newline).
+	 * A raster of Height rows, in order from top to bottom. 
+	 * 
+	 * Por lo que tenemos 4 secciones de caracteres ASCIIs. Cada seccion separada por un whitespace.
+	 */
 	n = read(f, &c, 1);
 	n = write(fout, &c, 1);
 
-	while (! isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
+	for (i=0;i<=3;i++) {
+		while (! isspace(c) ) {
+			n = read(f, &c, 1);
+			n = write(fout, &c, 1);
+		}
+	
+		while (isspace(c) ) {
+			n = read(f, &c, 1);
+			n = write(fout, &c, 1);
+		}
 
-	while (isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
-
-	while (! isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
-
-	while (isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
-
-	while (! isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
-
-	while (isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
-	}
-
-	while (! isspace(c) ) {
-		n = read(f, &c, 1);
-		n = write(fout, &c, 1);
 	}
 
 }
@@ -62,8 +57,7 @@ void main (void) {
 	int color_media = 0;
 
 	f=open("cara2.pgm", O_RDONLY);
-	//fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC);
-	fout=open("salida.pgm", O_RDWR);
+	fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IRGRP | S_IROTH);
 
 	cabecera_pgm(f, fout);
 
