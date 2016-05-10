@@ -56,7 +56,8 @@ void main (void) {
 
 	int color_media = 0;
 
-	f=open("cara2.pgm", O_RDONLY);
+	// f=open("cara2.pgm", O_RDONLY);
+	f=open("virtual.pgm", O_RDONLY);
 	fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IRGRP | S_IROTH);
 
 	cabecera_pgm(f, fout);
