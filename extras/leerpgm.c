@@ -65,10 +65,10 @@ void mostrar_original(unsigned  char c) {
 	}
 }
 
-unsigned char sgm[480][4];
+int sgm[480][4];
 int idx = 0;
 
-void agregar_segmento(unsigned char flanco, unsigned char fila, unsigned char columna) {
+void agregar_segmento(unsigned char flanco, int fila, int columna) {
 	if (flanco == 0) /* flanco descendente, de blanco (255) paso a negro (0) */
 	{
 		sgm[idx][0] = fila;
