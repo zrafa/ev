@@ -9,7 +9,7 @@
  * continuos para considerarse un cambio de color */
 #define MARGEN 15
 
-// #define DEBUG 0
+#define DEBUG 0
 
 void cabecera_pgm(int f, int fout) {
 	
@@ -65,6 +65,27 @@ void mostrar_original(unsigned  char c) {
 	}
 }
 
+unsigned char sgm[480][4];
+int idx = 0;
+
+void agregar_segmento(unsigned char flanco, unsigned char fila, unsigned char columna) {
+	if (flanco == 0) /* flanco descendente, de blanco (255) paso a negro (0) */
+	{
+		sgm[idx][0] = fila;
+		sgm[idx][1] = columna;
+	} else { 	/* flanco ascendente, de negro (0) paso a blanco (255) */
+		sgm[idx][2] = fila;
+		sgm[idx][3] = columna;
+		idx++;
+	}
+}
+
+void mostrar_sgm() {
+	int i = 0;
+	for (i=0; i<480; i++)
+		printf("f1: %i, c1: %i,    , f2: %i, c2: %i\n", sgm[i][0], sgm[i][1], sgm[i][2], sgm[i][3]);
+}
+
 void main (void) {
 	unsigned char c = 0;	/* color leido del archivo original */
 	unsigned char co = 0;	/* color output : es blanco (255) o negro (0) */
@@ -95,8 +116,12 @@ void main (void) {
 		#endif
 
 		co = 0;
-		if (((c-ca)>MARGEN) || ((ca-c)>MARGEN)) {
+		if ((ca-c) > MARGEN) {		/* flanco descendente */
 			co = 255;
+			agregar_segmento(0, fila, col);
+		} else if ((c-ca) > MARGEN) {	/* flanco ascendente */
+			co = 255;
+			agregar_segmento(1, fila, col);
 		}
 		no = write(fout, &co, 1);
 
@@ -110,4 +135,5 @@ void main (void) {
 	close(f);
 	close(fout);
 
+	mostrar_sgm();
 }
