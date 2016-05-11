@@ -9,7 +9,7 @@
  * continuos para considerarse un cambio de color */
 #define MARGEN 15
 
-#define DEBUG 1
+// #define DEBUG 0
 
 void cabecera_pgm(int f, int fout) {
 	
@@ -77,18 +77,15 @@ void main (void) {
 
 	// f=open("cara2.pgm", O_RDONLY);
 	f=open("virtual.pgm", O_RDONLY);
-	//fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IRGRP | S_IROTH);
-	fout=open("salida.pgm", O_RDWR | O_CREAT);
+	fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+	//fout=open("salida.pgm", O_TRUNC | O_CREAT);
 
 	cabecera_pgm(f, fout);
 
 	n = read(f, &c, 1);
-	n = write(fout, &c, 1);
+	ca = c;
 
-	printf("%i ", c);
 	while (n != 0) {
-		ca = c;
-		n = read(f, &c, 1);
 
 
 		color_media = color_media + c;
@@ -97,13 +94,14 @@ void main (void) {
 		mostrar_original(c);
 		#endif
 
-// if (c>200) {
 		co = 0;
 		if (((c-ca)>MARGEN) || ((ca-c)>MARGEN)) {
 			co = 255;
 		}
 		no = write(fout, &co, 1);
 
+		ca = c;
+		n = read(f, &c, 1);
 			
 	}
 
