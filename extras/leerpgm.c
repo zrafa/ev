@@ -1,9 +1,15 @@
 
+#include <ctype.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <ctype.h>
+#include <unistd.h>
 
+/* MARGEN es la diferencia que debe haber entre dos colores
+ * continuos para considerarse un cambio de color */
+#define MARGEN 15
+
+#define DEBUG 1
 
 void cabecera_pgm(int f, int fout) {
 	
@@ -44,21 +50,35 @@ void cabecera_pgm(int f, int fout) {
 
 }
 
+int fila = 0;
+int col = 0;
+void mostrar_original(unsigned  char c) {
+
+	printf("%i ", c);
+
+	col++;
+	if (col == 640) {
+		printf("\n");
+		col = 0;
+		fila++;
+		printf("FILA=%i\n",fila);
+	}
+}
+
 void main (void) {
-	unsigned char c = 0;
-	unsigned char co = 0;
+	unsigned char c = 0;	/* color leido del archivo original */
+	unsigned char co = 0;	/* color output : es blanco (255) o negro (0) */
 	unsigned char ca = 0; /* color anterior */
 	unsigned char n = 0;
 	unsigned char no = 0;
 	int f, fout;
-	int col = 0;
-	int fila = 0;
 
 	int color_media = 0;
 
 	// f=open("cara2.pgm", O_RDONLY);
 	f=open("virtual.pgm", O_RDONLY);
-	fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IRGRP | S_IROTH);
+	//fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IRGRP | S_IROTH);
+	fout=open("salida.pgm", O_RDWR | O_CREAT);
 
 	cabecera_pgm(f, fout);
 
@@ -73,32 +93,23 @@ void main (void) {
 
 		color_media = color_media + c;
 
-		printf("%i ", c);
-		col++;
-		if (col == 640) {
-			printf("\n");
-			col = 0;
-			fila++;
-			printf("FILA=%i\n",fila);
-		}
+		#ifdef DEBUG
+		mostrar_original(c);
+		#endif
+
 // if (c>200) {
-if (((c-ca)>15) || ((ca-c)>15)) {
-	co = 255;
-	no = write(fout, &co, 1);
-			
-} else {
-	co = 0;
-	no = write(fout, &co, 1);
-}
+		co = 0;
+		if (((c-ca)>MARGEN) || ((ca-c)>MARGEN)) {
+			co = 255;
+		}
+		no = write(fout, &co, 1);
 
 			
 	}
+
 	printf("\n media color = %i \n", color_media/(640*480));
+
 	close(f);
 	close(fout);
-
-
-
-
 
 }
