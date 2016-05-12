@@ -7,7 +7,7 @@
 
 /* MARGEN es la diferencia que debe haber entre dos colores
  * continuos para considerarse un cambio de color */
-#define MARGEN 15
+#define MARGEN 100
 
 #define DEBUG 0
 
@@ -65,7 +65,7 @@ void mostrar_original(unsigned  char c) {
 	}
 }
 
-int sgm[480][4];
+int sgm[500][4];
 int idx = 0;
 
 void agregar_segmento(unsigned char flanco, int fila, int columna) {
@@ -78,6 +78,40 @@ void agregar_segmento(unsigned char flanco, int fila, int columna) {
 		sgm[idx][3] = columna;
 		idx++;
 	}
+}
+
+void perpendicular() {
+	unsigned char encontrado = 0;
+	int fi = sgm[1][0];
+	int ff = 0;
+	int ci = sgm[1][1];
+	int cf = 0;
+
+	int i = 48;
+	int t = 0;
+	int c = 0;
+
+	printf ("\nANTES DE ENCONTRADO c=%i  i=%i \n", c, i);
+	cf = sgm[i][1];
+	printf ("\nDESPUES DE ENCONTRADO c=%i  i=%i \n", c, i);
+	while (! encontrado) {
+		if (sgm[i+1][1] <= cf) {
+		   t = cf - sgm[i+1][1];
+		   if (cf+t >= sgm[i+1][3]) {
+			t = cf+t - sgm[i+1][3];
+			c = c + t;  /* t tiene que ser mayor */
+			encontrado=1;
+		   } else {
+			c = c + t;  /* t tiene que ser mayor */
+			cf = cf + t;
+		   }
+		
+			
+		}
+	printf ("c=%i  i=%i t=%i sgm[i+1][1]=%i  cf=%i sgm[i][1]=%i \n", c, i, t, sgm[i+1][1], cf, sgm[i][1]);
+			i++;
+	}
+	printf ("c=%i  i=%i \n", c, i);
 }
 
 void mostrar_sgm() {
@@ -97,7 +131,7 @@ void main (void) {
 	int color_media = 0;
 
 	// f=open("cara2.pgm", O_RDONLY);
-	f=open("virtual.pgm", O_RDONLY);
+	f=open("virtual2.pgm", O_RDONLY);
 	fout=open("salida.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
 	//fout=open("salida.pgm", O_TRUNC | O_CREAT);
 
@@ -136,4 +170,5 @@ void main (void) {
 	close(fout);
 
 	mostrar_sgm();
+	perpendicular();
 }
