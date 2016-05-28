@@ -53,7 +53,7 @@ class PelosVisionTkGui(Frame):
 	self.limite = Entry(self)
 	self.limite.grid(row=1, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.limite.delete(0, END)
-	self.limite.insert(0, "70")
+	self.limite.insert(0, "40")
 
         lbl = Label(self, text="Grosor obtenido (en pixels)")
         lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
@@ -108,7 +108,7 @@ class PelosVisionTkGui(Frame):
 	self.minimo = Entry(self)
 	self.minimo.grid(row=12, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.minimo.delete(0, END)
-	self.minimo.insert(0, "15")
+	self.minimo.insert(0, "5")
 
 	menu = Menu(root)
 	root.config(menu=menu)

@@ -91,13 +91,48 @@ void perpendicular() {
 	int t = 0;
 	int c = 0;
 
+	int f, fout;
+	int j;
+	int k;
+	int n;
+	unsigned char ch;
+
+/*
+	f=open("salida.pgm", O_RDONLY);
+	fout=open("salida2.pgm", O_RDWR | O_CREAT | O_TRUNC,  S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH);
+
+	for (j=0;j<i;j++) {
+	for (k=0;k<640;k++) {
+		n = read(f, &ch, 1);
+		n = write(fout, &ch, 1);
+	}
+	}
+*/
+
+	ff = i;
 	printf ("\nANTES DE ENCONTRADO c=%i  i=%i \n", c, i);
 	cf = sgm[i][1];
 	printf ("\nDESPUES DE ENCONTRADO c=%i  i=%i \n", c, i);
 	while (! encontrado) {
-		if (sgm[i+1][1] <= cf) {
-		   t = cf - sgm[i+1][1];
-		   if (cf+t >= sgm[i+1][3]) {
+
+/*
+		for (k=0;k<cf;k++) {
+			n = read(f, &ch, 1);
+			n = write(fout, &ch, 1);
+		}
+		n = read(f, &ch, 1);
+		ch=200;
+		n = write(fout, &ch, 1);
+		for (k=cf+1;k<640;k++) {
+			n = read(f, &ch, 1);
+			n = write(fout, &ch, 1);
+		}
+*/
+
+		if (sgm[i+1][1] < sgm[i][1]) {		/* si el extremo izquierdo siguiente esta a la izq */
+		   t = sgm[i][1] - sgm[i+1][1];
+		   if (cf+t >= sgm[i+1][3]) {	/* si el extremo derecho siguiente es inferior que el despl */
+			/* NO. NO es cf+t, es ff+t y cf++. Pero tenemos que ver contra quien comparar, porque no sabemos en que i está el punto que queremos obtener de sgm para comparar con ff+t */
 			t = cf+t - sgm[i+1][3];
 			c = c + t;  /* t tiene que ser mayor */
 			encontrado=1;
@@ -107,10 +142,24 @@ void perpendicular() {
 		   }
 		
 			
+		} else if (sgm[i+1][1] == cf) {
+			cf++;
+			c++;
 		}
 	printf ("c=%i  i=%i t=%i sgm[i+1][1]=%i  cf=%i sgm[i][1]=%i \n", c, i, t, sgm[i+1][1], cf, sgm[i][1]);
 			i++;
 	}
+
+/*
+	n = read(f, &ch, 1);
+	while (n>0) {
+		n = write(fout, &ch, 1);
+		n = read(f, &ch, 1);
+	}
+*/
+
+	close(f);
+	close(fout);
 	printf ("c=%i  i=%i \n", c, i);
 }
 

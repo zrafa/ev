@@ -1089,6 +1089,8 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 	double mx, Mx, my, My;
 	double mox, Mox, moy, Moy;
 
+	int m = 0;
+
 	for(k=0;k<n;k++) {
 		if (k==i) continue;
 		if (k==j) continue;
@@ -1116,12 +1118,16 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 
 		if ( (mx <= jx) && (jx <= Mx) && (my <= jy) && (jy <=My) && \
 		   (mox <= jx) && (jx <= Mox) && (moy <= jy) && (jy <=Moy))
-				return 1;
+				m++;
+
+// RAFA				return 1;
 				
 		//	 if (x >= ix)
 		//		continue;
 	}
-	return 0; /* No hubo interseccion con ninguna recta */
+	
+// RAFA	return 0; /* No hubo interseccion con ninguna recta */
+	return m;
 
 }
 
@@ -1200,6 +1206,17 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 				x=s[i*dim+2];
 				y=s[i*dim+3];
 				break;
+			//case 3:
+				// pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+				//x = mx+(pmx-mx)/2;
+				//y = pp*x + pb;
+			//	pb = y - (   ((-1) * 1/f[i*2] ) * x  );
+			//case 4:
+				// pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+			//	x = pmx+(Mx-pmx)/2;
+			//	y = pp*x + pb;
+			//	pb = y - (   ((-1) * 1/f[i*2] ) * x  );
+				
 			}
 
 		for(j=0;j<n;j++) {
@@ -1227,28 +1244,49 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
 
 
-			 if ((mx >= ix) || (Mx <= ix) )
+			if ((mx >= ix) || (Mx <= ix) )
 				continue;
 			 if ((my >= iy) || (My <= iy) )
 				continue;
 				
-			 if (x >= ix)
-				continue;
+// RAFA			 if (x >= ix)
+// RAFA				continue;
 
 			// Si no son paralelos los segmentos estimamos que los segmentos no son del mismo pelo
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
 			double a;
-			a= f[i*2] - f[j*2];
+			double b;
+			double c;
+//			a= f[i*2] - f[j*2];
 			/* TODO : el 0.1 tiene que ser "definible", para indicar "cuan" paralela aceptamos los segmentos opuestos */
-			if ( (a < -0.1) || (a > 0.1) )
+//			if ( (a < -0.1) || (a > 0.1) )
+//				continue;
+
+			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			b = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] - s[j*dim+2]: s[j*dim+2] - s[j*dim+0];
+
+			if ((a <= 0.1) & (b > 0.1))
 				continue;
 
-
+			a = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			b = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] - s[j*dim+3]: s[j*dim+3] - s[j*dim+1];
+			if ((a <= 0.1) & (b > 0.1))
+				continue;
+			
+			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			c= f[i*2] >= f[j*2] ? f[i*2] - f[j*2] : f[j*2] - f[i*2];
+			if ((a > 0.1) & (b > 0.1) & (c > 0.1))
+				continue;
+			
 			/* Si la perpendicular intersecta algun otro segmento entonces 
 			 * es una perpendicular confusa, con ruido 
 			 */
 			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) )
 				continue;
+// RAFA				continue;
+
+//			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) != 2 )
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
