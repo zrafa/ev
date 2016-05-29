@@ -19,22 +19,23 @@
 #
 # -----------------------------------------------------------------------------
 
-mipsel:
-	PATH=/usr/local/jlime-2010.1/mipsel/bin/:/usr/bin/:/bin/ mipsel-linux-gcc -O3 -o lsd-mipsel lsd_cmd.c lsd.c -lm
-mips:
-	mips-linux-gnu-gcc -O3 -o lsd-mips lsd_cmd.c lsd.c -lm
-
-openwrt:
-	PATH=/home/rafa/embebidos/mr3020/OpenWrt-Toolchain-ar71xx-for-mips_r2-gcc-4.6-linaro_uClibc-0.9.33.2/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/bin/:/usr/bin:/bin/ mips-openwrt-linux-gcc -O3 -o lsd-openwrt lsd_cmd.c lsd.c -lm
-
-
 all: lsd lsd_call_example
 
-lsd: lsd.c lsd.h lsd_cmd.c
-	cc -O3 -pg -o lsd lsd_cmd.c lsd.c -lm
+mipsel:
+	PATH=/usr/local/jlime-2010.1/mipsel/bin/:/usr/bin/:/bin/ mipsel-linux-gcc -O3 -o lsd-mipsel lsd_cmd.c lsd.c leerpgm.c -lm
+mips:
+	mips-linux-gnu-gcc -O3 -o lsd-mips lsd_cmd.c lsd.c leerpgm.c -lm
+
+openwrt:
+	PATH=/home/rafa/embebidos/mr3020/OpenWrt-Toolchain-ar71xx-for-mips_r2-gcc-4.6-linaro_uClibc-0.9.33.2/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/bin/:/usr/bin:/bin/ mips-openwrt-linux-gcc -O3 -o lsd-openwrt lsd_cmd.c lsd.c leerpgm.c -lm
+
+
+
+lsd: lsd.c lsd.h lsd_cmd.c leerpgm.c
+	cc -O3 -pg -o lsd lsd_cmd.c lsd.c leerpgm.c -lm
 
 lsd_call_example: lsd.c lsd.h lsd_call_example.c
-	cc -o lsd_call_example lsd_call_example.c lsd.c -lm
+	cc -o lsd_call_example lsd_call_example.c lsd.c leerpgm.c -lm
 
 doc: lsd.c lsd.h doxygen.config
 	doxygen doxygen.config

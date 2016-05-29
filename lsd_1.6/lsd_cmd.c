@@ -70,6 +70,9 @@
 #include <ctype.h>
 #include "lsd.h"
 
+#include "leerpgm.h"
+extern unsigned char pixels[640*480];
+
 #ifndef FALSE
 #define FALSE 0
 #endif /* !FALSE */
@@ -1131,6 +1134,36 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 
 }
 
+int es_fondo(double x, double y, double ix, double iy) {
+	int r=0;
+	unsigned int mx, my;
+	unsigned int ux, uy, uix, uiy;
+
+	ux = (unsigned int) x;
+	uy = (unsigned int) y;
+	uix = (unsigned int) ix;
+	uiy = (unsigned int) iy;
+
+	if (ux>=uix) 
+		mx = uix+(ux-uix)/2;
+	else mx = ux+(uix-ux)/2;
+//	printf("x %i  ix %i  mx %i\n", ux, uix, mx);
+	if (uy>=uiy) 
+		my = uiy+(uy-uiy)/2;
+	else my = uy+(uiy-uy)/2;
+//	printf("y %i  iy %i  my %i\n", uy, uiy, my);
+
+	if ( ((mx==ux) && (my==uy)) || \
+		((mx==uix) && (my==uiy)))
+		return 0;
+		
+	if (pixels[my*640+mx]>=200)
+		r=1;
+
+	return r;
+}
+
+
 void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior)
 {
 	/* x,y punto medio del segmento */
@@ -1141,6 +1174,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 	double pb, pp; // desplazamiento y pendiente de la perpendicular a un punto
 	double ix, iy; // x e y de la interseccion entre las dos rectas 
 	double d; //distancia entre dos puntos
+
 
 /* Creamos un archivo eps para anexar */
   FILE * eps;
@@ -1160,6 +1194,23 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
 /* Fin de Creamos un archivo eps para anexar */
 
+
+/* cargamos toda la imagen en un arreglo */
+	cargar_pixels("unpelo.pgm");
+
+
+/*
+	for (i=0;i<480;i++) {
+		printf ("fila %i : ",i);
+	for (j=0;j<640;j++) {
+		printf("columna %i : %i ", j, pixels[i*480+j]);
+		printf("\n");
+	}
+	};
+*/
+
+
+/* FIN de cargamos toda la imagen en un arreglo */
 	for(i=0;i<n;i++) {
 		mx = s[i*dim+0] <= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
 		Mx = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
@@ -1262,21 +1313,24 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 //			if ( (a < -0.1) || (a > 0.1) )
 //				continue;
 
+			/* si x1 y x2 son iguales entonces el pelo es vertical, es un caso extremo para las pendientes */
 			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
 			b = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] - s[j*dim+2]: s[j*dim+2] - s[j*dim+0];
 
-			if ((a <= 0.1) & (b > 0.1))
+			if ((a <= 0.1) && (b > 0.1))
 				continue;
 
+			/* si y1 y y2 son iguales entonces el pelo es horizontal, es un caso extremo para las pendientes */
 			a = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
 			b = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] - s[j*dim+3]: s[j*dim+3] - s[j*dim+1];
-			if ((a <= 0.1) & (b > 0.1))
+			if ((a <= 0.1) && (b > 0.1))
 				continue;
 			
+			/* si el pelo esta inclinado nos fijamos si son paralelos los segmentos analizados */
 			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
 			b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
 			c= f[i*2] >= f[j*2] ? f[i*2] - f[j*2] : f[j*2] - f[i*2];
-			if ((a > 0.1) & (b > 0.1) & (c > 0.1))
+			if ((a > 0.1) && (b > 0.1) & (c > 0.1))
 				continue;
 			
 			/* Si la perpendicular intersecta algun otro segmento entonces 
@@ -1284,7 +1338,20 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			 */
 			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) )
 				continue;
-// RAFA				continue;
+
+			/* si el punto medio de la perpendicular está fuera de un pelo */
+			mx = x>=ix ? ix+(x-ix)/2 : x+(ix-x)/2;
+			if ((x==ix) || (mx==0)) mx=x;
+
+			my = y>=iy ? iy+(y-iy)/2 : y+(iy-y)/2;
+			if ((y==iy) || (my==0)) my=y;
+			//printf("color=%i \n", pixels[(int)(my*640+mx)]);
+			//printf("%f %f %i\n", x, y, pixels[(unsigned int)(my*640+mx)]);
+//			printf("%f %f %i\n", mx, my, pixels[(unsigned int)(my*480+mx)]);
+			// if (pixels[(unsigned int)((my)*480+mx)]>=200)
+			//if (pixels[(unsigned int)(y*480+x)]>=200)
+			if (es_fondo(x, y, ix, iy))
+			 	continue;
 
 //			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) != 2 )
 
