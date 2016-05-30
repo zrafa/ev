@@ -70,8 +70,6 @@
 #include <ctype.h>
 #include "lsd.h"
 
-#include "leerpgm.h"
-extern unsigned char pixels[640*480];
 
 #ifndef FALSE
 #define FALSE 0
@@ -1134,7 +1132,7 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 
 }
 
-int es_fondo(double x, double y, double ix, double iy) {
+int es_fondo(double x, double y, double ix, double iy, double *image, int xsize, int ysize) {
 	int r=0;
 	unsigned int mx, my;
 	unsigned int ux, uy, uix, uiy;
@@ -1157,14 +1155,15 @@ int es_fondo(double x, double y, double ix, double iy) {
 		((mx==uix) && (my==uiy)))
 		return 0;
 		
-	if (pixels[my*640+mx]>=200)
+	//if (pixels[my*640+mx]>=200)
+	if (image[my*xsize+mx]>=200)
 		r=1;
 
 	return r;
 }
 
 
-void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior)
+void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior, double *image)
 {
 	/* x,y punto medio del segmento */
 	int cant=1, sum=0;
@@ -1196,7 +1195,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
 
 /* cargamos toda la imagen en un arreglo */
-	cargar_pixels("unpelo.pgm");
+	// cargar_pixels("unpelo.pgm");
 
 
 /*
@@ -1303,7 +1302,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 // RAFA			 if (x >= ix)
 // RAFA				continue;
 
-			// Si no son paralelos los segmentos estimamos que los segmentos no son del mismo pelo
+			// Si los segmentos NO son paralelos entonces suponemos que NO son del mismo pelo
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
 			double a;
 			double b;
@@ -1330,7 +1329,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
 			b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
 			c= f[i*2] >= f[j*2] ? f[i*2] - f[j*2] : f[j*2] - f[i*2];
-			if ((a > 0.1) && (b > 0.1) & (c > 0.1))
+			if ((a > 0.1) && (b > 0.1) && (c > 0.1))
 				continue;
 			
 			/* Si la perpendicular intersecta algun otro segmento entonces 
@@ -1339,21 +1338,20 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) )
 				continue;
 
-			/* si el punto medio de la perpendicular está fuera de un pelo */
-			mx = x>=ix ? ix+(x-ix)/2 : x+(ix-x)/2;
-			if ((x==ix) || (mx==0)) mx=x;
+			/* Verificamos si el punto medio de la perpendicular está dentro o fuera de un pelo */
+			//mx = x>=ix ? ix+(x-ix)/2 : x+(ix-x)/2;
+			//if ((x==ix) || (mx==0)) mx=x;
 
-			my = y>=iy ? iy+(y-iy)/2 : y+(iy-y)/2;
-			if ((y==iy) || (my==0)) my=y;
+			//my = y>=iy ? iy+(y-iy)/2 : y+(iy-y)/2;
+			//if ((y==iy) || (my==0)) my=y;
 			//printf("color=%i \n", pixels[(int)(my*640+mx)]);
 			//printf("%f %f %i\n", x, y, pixels[(unsigned int)(my*640+mx)]);
 //			printf("%f %f %i\n", mx, my, pixels[(unsigned int)(my*480+mx)]);
 			// if (pixels[(unsigned int)((my)*480+mx)]>=200)
 			//if (pixels[(unsigned int)(y*480+x)]>=200)
-			if (es_fondo(x, y, ix, iy))
+			if (es_fondo(x, y, ix, iy, image, xsize, ysize))
 			 	continue;
 
-//			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) != 2 )
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
@@ -1446,7 +1444,7 @@ int main(int argc, char ** argv)
   	double fcs[n][2];
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
-	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior);
+	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior, image);
     // write_eps(segs,n,dim,get_str(arg,"epsfile"),X,Y,get_double(arg,"width"));
 
 
