@@ -1137,6 +1137,7 @@ int es_fondo(double x, double y, double ix, double iy, double *image, int xsize,
 	unsigned int mx, my;
 	unsigned int ux, uy, uix, uiy;
 
+
 	ux = (unsigned int) x;
 	uy = (unsigned int) y;
 	uix = (unsigned int) ix;
@@ -1199,10 +1200,36 @@ void filtro_medula(int xsize, int ysize, double *image) {
 
 }
 
+
+double medidas[200]; // cada medida encontrada, util para luego sacar la variancia y la desviacion estandar
+
+void calcular_varianza_desvio_estandar(int sum, int cant, int mi) {
+       double varianza = 0;
+       double desv_estandar = 0;
+       double media = (double) sum/cant;
+       int cant_en_desviacion = 0;     // cantidad de medidas dentro de la desviacion estandar
+       int i;
+
+       for (i=0;i<mi;i++) 
+               varianza = varianza + pow ( (medidas[i]-media) , 2);
+       varianza = varianza / mi;
+       desv_estandar = sqrt(varianza);
+       for (i=0;i<mi;i++) 
+               if (  ((media - desv_estandar) <= medidas[i] )   &&  (medidas[i] <= (media + desv_estandar)) )
+                       cant_en_desviacion++;
+
+       fprintf(stderr, "\n\tNro de Mediciones = %i \tMedia = %f\n", mi, media);
+       fprintf(stderr, "\tVarianza : %f\n", varianza);
+       fprintf(stderr, "\tDesviacion estandar : %f\n", sqrt(varianza));
+       fprintf(stderr, "\tCantidad de medidas dentro de la desviacion estandar : %i (%i%)\n\n", cant_en_desviacion,cant_en_desviacion*100/mi);
+
+}
+
+
 void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior, double *image)
 {
 	/* x,y punto medio del segmento */
-	int cant=1, sum=0;
+	int cant=0, sum=0;
 	int i, j, k;
 	double mx, my, Mx, My, pmx, pmy;
 	double x, y; // x e y del punto origen 
@@ -1244,6 +1271,16 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 	};
 */
 
+       /* para saber si son medidas buenas o malas y varianza y desviacion estandar*/
+       int mi = 0; // indice del vector medidas
+       int mi_old = 0; // indice del vector medidas
+       int cant_old=1, sum_old=0;
+       int k_old=0; // para saber si se hicieron las 3 mediciones en un segmento
+       char lineas_rojas[600];
+       char linea_roja[200];
+
+       for (i=0;i<100;i++) medidas[i]=0;
+
 
 /* FIN de cargamos toda la imagen en un arreglo */
 	for(i=0;i<n;i++) {
@@ -1276,6 +1313,15 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
 		pp = (-1) * 1/f[i*2] ;
 		
+
+		/* para saber si son medidas buenas o malas */
+               sum_old = sum;
+               cant_old = cant;
+               mi_old = mi;
+               k_old = 0;
+               lineas_rojas[0] = '\0';
+               linea_roja[0] = '\0';
+
 		for(k=0;k<3;k++) {
 
 			/* Por cada segmento tomamos 3 puntos, inicio, medio y final */
@@ -1409,13 +1455,25 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 				 */
 				sum = sum + d;
 				cant++;
+
+                                k_old++;
+                               medidas[mi] = d; mi++;
+
+                               fprintf(stderr, "d = %f\n", d);
+
+       
+
 /* Agregamos datos al archivo grosordelpelo.eps */
-      fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+      // fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+ sprintf(linea_roja, "newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
 x,
 (double) ysize - y,
                ix, 
 (double) ysize - iy
                  );
+
+       strcat(lineas_rojas, linea_roja);
+
 /* Fin de Agregamos datos al archivo grosordelpelo.eps */
 
 			}
@@ -1425,8 +1483,20 @@ x,
 		}		/* del for j */
 		}		/* del for k */
 		
+		/* Si hay al menos 2 medidas de 3 buenas entonces las aceptamos como validas */
+               if (k_old < 2) {
+                       sum = sum_old;
+                       cant = cant_old;
+                       mi = mi_old;
+                       fprintf(stderr, "Medidas malas \n");
+               } else {
+                       fprintf( eps,"%s", lineas_rojas);
+                       fprintf(stderr, "Medidas buenas \n");
+               }
+
+
 	}
-	/* printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant); */
+	calcular_varianza_desvio_estandar(sum, cant, mi); // mi es el indice del vector, nro de medidas
 	printf("Grosor del PELO en pixels : %i\n", sum/cant);
 
 
