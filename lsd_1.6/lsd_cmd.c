@@ -1156,12 +1156,48 @@ int es_fondo(double x, double y, double ix, double iy, double *image, int xsize,
 		return 0;
 		
 	//if (pixels[my*640+mx]>=200)
-	if (image[my*xsize+mx]>=200)
+	if (image[my*xsize+mx]>=100)
 		r=1;
 
 	return r;
 }
 
+#define COLOR_FONDO 200
+
+int vecino_es_fondo(int x, int y, int xsize, int ysize, double *image) {
+
+	if ((x<=0) || (x>=xsize-1)) return 1;
+	if ((y<=0) || (y>=ysize-1)) return 1;
+
+	/* verificamos los 8 vecinos buscando fondo*/
+	if (image[y*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[y*xsize+(x+1)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x+1)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x+1)] >= COLOR_FONDO) return 1;
+
+	return 0;
+}
+
+
+void filtro_medula(int xsize, int ysize, double *image) {
+	int x, y;
+
+	for (y=0;y<ysize;y++) {
+	for (x=0;x<xsize;x++) {
+		if ((image[y*xsize+x] < 150) && 
+		(! vecino_es_fondo(x, y, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x-1, y-1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x-1, y+1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x+1, y-1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x+1, y-1, xsize, ysize, image)) )
+			image[y*xsize+x] = 0;
+	}}
+
+}
 
 void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior, double *image)
 {
@@ -1304,6 +1340,8 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
 			// Si los segmentos NO son paralelos entonces suponemos que NO son del mismo pelo
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
+			double xp;
+			double yp;
 			double a;
 			double b;
 			double c;
@@ -1313,23 +1351,31 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 //				continue;
 
 			/* si x1 y x2 son iguales entonces el pelo es vertical, es un caso extremo para las pendientes */
-			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
-			b = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] - s[j*dim+2]: s[j*dim+2] - s[j*dim+0];
+			//xp = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			if (s[i*dim+0] >= s[i*dim+2])
+				xp = s[i*dim+0] - s[i*dim+2];
+			else
+				xp = s[i*dim+2] - s[i*dim+0];
 
-			if ((a <= 0.1) && (b > 0.1))
+			//b = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] - s[j*dim+2]: s[j*dim+2] - s[j*dim+0];
+			if (s[j*dim+0] >= s[j*dim+2])
+				b = s[j*dim+0] - s[j*dim+2];
+			else
+				b = s[j*dim+2] - s[j*dim+0];
+			if ((xp <= 0.1) && (b > 0.1))
 				continue;
 
 			/* si y1 y y2 son iguales entonces el pelo es horizontal, es un caso extremo para las pendientes */
-			a = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			yp = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
 			b = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] - s[j*dim+3]: s[j*dim+3] - s[j*dim+1];
-			if ((a <= 0.1) && (b > 0.1))
+			if ((xp > 0.1) && (yp <= 0.1) && (b > 0.1))
 				continue;
 			
 			/* si el pelo esta inclinado nos fijamos si son paralelos los segmentos analizados */
-			a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
-			b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			// a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			// b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
 			c= f[i*2] >= f[j*2] ? f[i*2] - f[j*2] : f[j*2] - f[i*2];
-			if ((a > 0.1) && (b > 0.1) && (c > 0.1))
+			if ((xp > 0.1) && (yp > 0.1) && (c > 0.1))
 				continue;
 			
 			/* Si la perpendicular intersecta algun otro segmento entonces 
@@ -1426,6 +1472,10 @@ int main(int argc, char ** argv)
 
   /* read input file */
   image = read_pgm_image_double(&X,&Y,get_str(arg,"in"));
+
+  /* RAFA */
+  filtro_medula(X, Y, image);
+
 
   /* execute LSD */
   segs = LineSegmentDetection( &n, image, X, Y,

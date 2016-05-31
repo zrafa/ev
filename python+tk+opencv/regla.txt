@@ -1,0 +1,6 @@
+
+Ancho 112 pixels
+
+Si 112 pixels son 100 micrones entonces
+
+1 pixel es 0.8928 micrones
