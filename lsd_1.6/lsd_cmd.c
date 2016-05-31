@@ -1221,7 +1221,7 @@ void calcular_varianza_desvio_estandar(int sum, int cant, int mi) {
        fprintf(stderr, "\n\tNro de Mediciones = %i \tMedia = %f\n", mi, media);
        fprintf(stderr, "\tVarianza : %f\n", varianza);
        fprintf(stderr, "\tDesviacion estandar : %f\n", sqrt(varianza));
-       fprintf(stderr, "\tCantidad de medidas dentro de la desviacion estandar : %i (%i%)\n\n", cant_en_desviacion,cant_en_desviacion*100/mi);
+       fprintf(stderr, "\tMedidas dentro de la desviacion estandar : %i (%i%)\n\n", cant_en_desviacion,cant_en_desviacion*100/mi);
 
 }
 
@@ -1497,7 +1497,7 @@ x,
 
 	}
 	calcular_varianza_desvio_estandar(sum, cant, mi); // mi es el indice del vector, nro de medidas
-	printf("Grosor del PELO en pixels : %i\n", sum/cant);
+	printf("Grosor del PELO en pixels : %f\n", (double)sum/cant);
 
 
 
