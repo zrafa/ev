@@ -1281,6 +1281,8 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
        for (i=0;i<200;i++) medidas[i]=0;
 
+	// Esto es para no medir en la medula y en segmentos muy chicos
+	int seg_muy_chico = 30;
 
 /* FIN de cargamos toda la imagen en un arreglo */
 	for(i=0;i<n;i++) {
@@ -1300,8 +1302,10 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
 		// distancia entre los dos puntos 
 		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		// Esto es para no medir en la medula y en segmentos muy chicos
 		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
-		if (d < cota_inferior) continue;
+		if (d < seg_muy_chico) continue;
+		// RAFA if (d < cota_inferior) continue;
 
 		/*  y = -(1/m) *x + b
 		 *  b = y - ( -(1/m) *x)
@@ -1371,8 +1375,10 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
 		// distancia entre los dos puntos 
 		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		// Esto es para no medir en la medula y en segmentos muy chicos
 		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
-		if (d < cota_inferior) continue;
+		if (d < seg_muy_chico) continue;
+		// RAFA if (d < cota_inferior) continue;
 
 
 
