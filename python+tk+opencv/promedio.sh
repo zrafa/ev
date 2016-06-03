@@ -3,9 +3,9 @@ SALIDA=/tmp/$RANDOM
 SALIDA_VARIANZA=/tmp/$RANDOM
 for i in `find $@ -type f`;do
     printf "\n\n Archivo $i:\n" >> $SALIDA_VARIANZA
-    ../lsd_1.6/lsd -T 10 -t 40  -a 100 -P salida.eps  $i salida.txt >> $SALIDA_VARIANZA 2>&1
+    ../lsd_1.6/lsd -T 10 -t 60  -a 100 -P salida.eps  $i salida.txt >> $SALIDA_VARIANZA 2>&1
 
-    ../lsd_1.6/lsd -T 10 -t 40  -a 100 -P salida.eps  $i salida.txt
+    ../lsd_1.6/lsd -T 10 -t 60  -a 100 -P salida.eps  $i salida.txt
 done | tee $SALIDA | awk 'BEGIN{sum = 0}{sum = sum + $NF}END{print sum/NR}'
 
 cat $SALIDA_VARIANZA | egrep -i "varianza|desviacion|mediciones|Archivo|^$" > ${SALIDA_VARIANZA}.res ; rm $SALIDA_VARIANZA

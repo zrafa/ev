@@ -1502,6 +1502,8 @@ x,
 
 
 	}
+	if (cant==0) cant=1;
+	if (mi==0) mi=1;
 	calcular_varianza_desvio_estandar(sum, cant, mi); // mi es el indice del vector, nro de medidas
 	printf("Grosor del PELO en pixels : %f\n", (double)sum/cant);
 

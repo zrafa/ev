@@ -53,7 +53,7 @@ class PelosVisionTkGui(Frame):
 	self.limite = Entry(self)
 	self.limite.grid(row=13, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.limite.delete(0, END)
-	self.limite.insert(0, "40")
+	self.limite.insert(0, "80")
 
 	self.lbl_estadistica = Text(self, height=6, width=60)
         self.lbl_estadistica.grid(row=1,column=1, sticky=W, pady=1, padx=5) 
@@ -143,7 +143,7 @@ class PelosVisionTkGui(Frame):
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
 		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
-		output2 = Popen(["cat", "salida.txt"], ).communicate()[0]
+		output2 = Popen(["./backup-de-la-foto.sh"], ).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		self.grosor.delete(0, END)
 		self.grosor.insert(0, output)
