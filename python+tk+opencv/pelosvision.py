@@ -99,7 +99,7 @@ class PelosVisionTkGui(Frame):
 	self.micron = Entry(self)
 	self.micron.grid(row=10, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.micron.delete(0, END)
-	self.micron.insert(0, "1")
+	self.micron.insert(0, "0.9743")
 
         lbl = Label(self, text="Valor deseado en la Secuencia de Fotos")
         lbl.grid(row=11,column=0, sticky=W, pady=1, padx=5) 
@@ -113,7 +113,7 @@ class PelosVisionTkGui(Frame):
 	self.minimo = Entry(self)
 	self.minimo.grid(row=12, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.minimo.delete(0, END)
-	self.minimo.insert(0, "5")
+	self.minimo.insert(0, "10")
 
 	menu = Menu(root)
 	root.config(menu=menu)

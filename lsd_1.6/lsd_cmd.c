@@ -1279,7 +1279,7 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
        char lineas_rojas[600];
        char linea_roja[200];
 
-       for (i=0;i<100;i++) medidas[i]=0;
+       for (i=0;i<200;i++) medidas[i]=0;
 
 
 /* FIN de cargamos toda la imagen en un arreglo */
