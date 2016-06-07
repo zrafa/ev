@@ -53,7 +53,7 @@ class PelosVisionTkGui(Frame):
 	self.limite = Entry(self)
 	self.limite.grid(row=13, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.limite.delete(0, END)
-	self.limite.insert(0, "80")
+	self.limite.insert(0, "50")
 
 	self.lbl_estadistica = Text(self, height=6, width=60)
         self.lbl_estadistica.grid(row=1,column=1, sticky=W, pady=1, padx=5) 
