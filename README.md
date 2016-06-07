@@ -1,9 +1,28 @@
-ev - pruebas para embedded vision
-=================================
+ev - Analisis Digital de Diametro de Fibra UNCOMA
+=================================================
 
 Este proyecto de I+D reune los temas visión embebida en una aplicación 
-para calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones).
+para calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones). El prototipo está orientado a ser utilizado en el campo directamente, midiendo la fibra sobre el animal.
 
+General Description
+===================
+This equipment uses optical and video technology to capture high resolution images of goat fibres, and
+software algorithms to recognise and determine the diameters of individual fibres in the specimen.
+This eliminates the need for intensive preparation of the fibre and, with a minimal amount of practice, accurate
+results can be achieved quickly and easily.
+The set of diameter measurements obtained during this process forms the basis from which other statistics of
+interest are derived.
+
+It lets to perform the measurement and
+characterisation of fibre diameter to within one micron without removing
+the fibre from the goat.
+It measures, calculates, displays and records:
+Mean fibre diameter,
+Standard Deviation of fibre diameters,
+Minimum fibre diameter, and
+Maximum fibre diameter.
+Coefficient of Variation of fibre
+diameter, and Comfort Factor.
 
 <img src="https://raw.githubusercontent.com/zrafa/ev/master/con-camara-y-pelos.jpg" alt="simm ram and atmega328p" width="500" height="400">
 
