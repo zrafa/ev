@@ -2,14 +2,14 @@ ev - pruebas para embedded vision
 =================================
 
 Este proyecto de I+D reune los temas visión embebida en una aplicación 
-para calcular el grosor de pelos en micrones.
+para calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones).
 
 
 <img src="https://raw.githubusercontent.com/zrafa/ev/master/con-camara-y-pelos.jpg" alt="simm ram and atmega328p" width="500" height="400">
 
 
-Estado: Utilizamos un programa llamado lsd. Con el programa lsd obtenemos los bordes del pelo en "segmentitos".
-Usando esos segmentitos hemos agregamos una funcion que calcula el grosor del pelo de manera básica.
+Estado: Utilizamos el algoritmo de tiempo lineal lsd para la detección de bordes.
+El prototipo embebido está escrito en ANSI C, y puede ser portado a distintas plataformas de hardware facilmente.
 
 Para compilar para mipsel usando el toolchain de JLime :
 
@@ -26,8 +26,8 @@ Testear con :
 ./lsd-mipsel Pelo40X.pgm  salida.txt
 ```
 
-Y nos calcula el grosor del pelo basicamente.
-El algoritmo utilizado para calcularlo con los segmentitos está en el archivo lsd_1.6/matematicas.txt. Y el codigo son dos funciones llamadas pendientes() y grosor(), que fueron agregadas al archivo fuente lsd_1.6/lsd-cmd.c 
+Y calcula el diametro de la fibra directamente.
+El algoritmo utilizado para realizacion la estadistica esta autodocumentado en el código.
 
 
 Salida testeada en la SIE
@@ -47,7 +47,7 @@ sys     0m 0.15s
 ```
 
 
-En la SIE calcula que el grosor del pelo que nos dieron es de 43 pixels.
+En la SIE la estadistica indica que la media es de 43 pixels.
 
 pelosvision.py
 ==============
