@@ -55,7 +55,7 @@ class PelosVisionTkGui(Frame):
 	self.limite.delete(0, END)
 	self.limite.insert(0, "50")
 
-	self.lbl_estadistica = Text(self, height=6, width=60)
+	self.lbl_estadistica = Text(self, height=10, width=60)
         self.lbl_estadistica.grid(row=1,column=1, sticky=W, pady=1, padx=5) 
 	self.lbl_estadistica.insert(END, "Hola que tal")
         lbl = Label(self, text="Estadistica obtenida :")
@@ -150,10 +150,15 @@ class PelosVisionTkGui(Frame):
 		self.grosormicron.delete(0, END)
 		self.grosormicron.insert(0, float(output)*float(self.micron.get()))
 		print output
-		output = Popen(["./procesar.sh", self.minimo.get(), self.limite.get(), filename ], stdout=PIPE).communicate()[0]
+
 		self.lbl_estadistica.delete('1.0', END)
-		self.lbl_estadistica.insert('1.0', "\n")
-		self.lbl_estadistica.insert('2.0', output)
+		# Las mediciones por rangos
+		output = Popen(["./procesar_rangos.sh", filename ], stdout=PIPE).communicate()[0]
+		self.lbl_estadistica.insert('1.0', output)
+		# Las mediciones clasicas
+		output = Popen(["./procesar.sh", self.minimo.get(), self.limite.get(), filename ], stdout=PIPE).communicate()[0]
+		self.lbl_estadistica.insert('4.0', '\n')
+		self.lbl_estadistica.insert('5.0', output)
 
     def mostrarFoto2(self,filename):
 		# Hay que ejecutar para hacer merge de los EPS generados :
