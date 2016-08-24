@@ -12,3 +12,11 @@ Regla 0.76 (75um) tiene un Ancho de 78 pixels
 Si 78 pixels son 76 micrones
 
 1 pixel es 0.9743 micrones
+
+
+
+
+Regla de 0.03mm
+37 pixels.
+
+1 pixel =  0.8108 micrones

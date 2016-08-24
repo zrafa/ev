@@ -24,7 +24,8 @@ all: lsd lsd_call_example
 mipsel:
 	PATH=/usr/local/jlime-2010.1/mipsel/bin/:/usr/bin/:/bin/ mipsel-linux-gcc -O3 -o lsd-mipsel lsd_cmd.c lsd.c -lm
 mips:
-	mips-linux-gnu-gcc -O3 -o lsd-mips lsd_cmd.c lsd.c -lm
+	# mipsel-openwrt-linux-uclibc-gcc -O3 -o lsd-mips lsd_cmd.c lsd.c -lm
+	mips-linux-gnu-gcc -mips32r2 -O3 -o lsd-mips lsd_cmd.c lsd.c -lm
 
 openwrt:
 	PATH=/home/rafa/embebidos/mr3020/OpenWrt-Toolchain-ar71xx-for-mips_r2-gcc-4.6-linaro_uClibc-0.9.33.2/toolchain-mips_r2_gcc-4.6-linaro_uClibc-0.9.33.2/bin/:/usr/bin:/bin/ mips-openwrt-linux-gcc -O3 -o lsd-openwrt lsd_cmd.c lsd.c -lm
@@ -32,10 +33,10 @@ openwrt:
 
 
 lsd: lsd.c lsd.h lsd_cmd.c 
-	cc -O3 -pg -o lsd lsd_cmd.c lsd.c -lm
+	cc -g -O3 -pg -o lsd lsd_cmd.c lsd.c -lm
 
 lsd_call_example: lsd.c lsd.h lsd_call_example.c
-	cc -o lsd_call_example lsd_call_example.c lsd.c -lm
+	cc -g -o lsd_call_example lsd_call_example.c lsd.c -lm
 
 doc: lsd.c lsd.h doxygen.config
 	doxygen doxygen.config

@@ -1164,6 +1164,7 @@ int es_fondo(double x, double y, double ix, double iy, double *image, int xsize,
 }
 
 #define COLOR_FONDO 200
+#define COLOR_BAJO 40
 
 int vecino_es_fondo(int x, int y, int xsize, int ysize, double *image) {
 
@@ -1183,6 +1184,27 @@ int vecino_es_fondo(int x, int y, int xsize, int ysize, double *image) {
 	return 0;
 }
 
+
+void medias_grises(int xsize, int ysize, double *image) {
+	int x, y;
+	int bajo, medio, alto;
+
+	bajo=0;
+	medio=0;
+	alto=0;
+
+	for (y=0;y<ysize;y++) {
+	for (x=0;x<xsize;x++) {
+		if (image[y*xsize+x] < COLOR_BAJO) 
+			bajo++;
+		else if (image[y*xsize+x] < COLOR_FONDO) 
+			medio++;
+		else
+			alto++;
+	}}
+//       fprintf(stderr, "\n\n\n\n\n\t color de pelo = %i \n\t gris = %i\n\t fondo = %i\n", (bajo*100/(xsize*ysize)), (medio*100/(xsize*ysize)), (alto*100/(xsize*ysize)) );
+
+}
 
 void filtro_medula(int xsize, int ysize, double *image) {
 	int x, y;
@@ -1573,6 +1595,8 @@ int main(int argc, char ** argv)
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
 	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior, image);
+  /* RAFA */
+  medias_grises(X, Y, image);
     // write_eps(segs,n,dim,get_str(arg,"epsfile"),X,Y,get_double(arg,"width"));
 
 
