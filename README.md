@@ -1,15 +1,34 @@
-ev - pruebas para embedded vision
-=================================
+ev - Analisis Digital de Diametro de Fibra UNCOMA
+=================================================
 
 Este proyecto de I+D reune los temas visión embebida en una aplicación 
-para calcular el grosor de pelos en micrones.
+para calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones). El prototipo está orientado a ser utilizado en el campo directamente, midiendo la fibra sobre el animal.
 
+General Description
+===================
+This equipment uses optical and video technology to capture high resolution images of goat fibres, and
+software algorithms to recognise and determine the diameters of individual fibres in the specimen.
+This eliminates the need for intensive preparation of the fibre and, with a minimal amount of practice, accurate
+results can be achieved quickly and easily.
+The set of diameter measurements obtained during this process forms the basis from which other statistics of
+interest are derived.
+
+It lets to perform the measurement and
+characterisation of fibre diameter to within one micron without removing
+the fibre from the goat.
+It measures, calculates, displays and records:
+Mean fibre diameter,
+Standard Deviation of fibre diameters,
+Minimum fibre diameter, and
+Maximum fibre diameter.
+Coefficient of Variation of fibre
+diameter, and Comfort Factor.
 
 <img src="https://raw.githubusercontent.com/zrafa/ev/master/con-camara-y-pelos.jpg" alt="simm ram and atmega328p" width="500" height="400">
 
 
-Estado: Utilizamos un programa llamado lsd. Con el programa lsd obtenemos los bordes del pelo en "segmentitos".
-Usando esos segmentitos hemos agregamos una funcion que calcula el grosor del pelo de manera básica.
+Estado: Utilizamos el algoritmo de tiempo lineal lsd para la detección de bordes.
+El prototipo embebido está escrito en ANSI C, y puede ser portado a distintas plataformas de hardware facilmente.
 
 Para compilar para mipsel usando el toolchain de JLime :
 
@@ -26,8 +45,8 @@ Testear con :
 ./lsd-mipsel Pelo40X.pgm  salida.txt
 ```
 
-Y nos calcula el grosor del pelo basicamente.
-El algoritmo utilizado para calcularlo con los segmentitos está en el archivo lsd_1.6/matematicas.txt. Y el codigo son dos funciones llamadas pendientes() y grosor(), que fueron agregadas al archivo fuente lsd_1.6/lsd-cmd.c 
+Y calcula el diametro de la fibra directamente.
+El algoritmo utilizado para realizacion la estadistica esta autodocumentado en el código.
 
 
 Salida testeada en la SIE
@@ -47,7 +66,7 @@ sys     0m 0.15s
 ```
 
 
-En la SIE calcula que el grosor del pelo que nos dieron es de 43 pixels.
+En la SIE la estadistica indica que la media es de 43 pixels.
 
 pelosvision.py
 ==============

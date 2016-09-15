@@ -70,6 +70,7 @@
 #include <ctype.h>
 #include "lsd.h"
 
+
 #ifndef FALSE
 #define FALSE 0
 #endif /* !FALSE */
@@ -1089,6 +1090,8 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 	double mx, Mx, my, My;
 	double mox, Mox, moy, Moy;
 
+	int m = 0;
+
 	for(k=0;k<n;k++) {
 		if (k==i) continue;
 		if (k==j) continue;
@@ -1116,25 +1119,146 @@ int intersecta(double x, double y, double ix, double iy, int i, int j, double pb
 
 		if ( (mx <= jx) && (jx <= Mx) && (my <= jy) && (jy <=My) && \
 		   (mox <= jx) && (jx <= Mox) && (moy <= jy) && (jy <=Moy))
-				return 1;
+				m++;
+
+// RAFA				return 1;
 				
 		//	 if (x >= ix)
 		//		continue;
 	}
-	return 0; /* No hubo interseccion con ninguna recta */
+	
+// RAFA	return 0; /* No hubo interseccion con ninguna recta */
+	return m;
 
 }
 
-void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior)
+int es_fondo(double x, double y, double ix, double iy, double *image, int xsize, int ysize) {
+	int r=0;
+	unsigned int mx, my;
+	unsigned int ux, uy, uix, uiy;
+
+
+	ux = (unsigned int) x;
+	uy = (unsigned int) y;
+	uix = (unsigned int) ix;
+	uiy = (unsigned int) iy;
+
+	if (ux>=uix) 
+		mx = uix+(ux-uix)/2;
+	else mx = ux+(uix-ux)/2;
+//	printf("x %i  ix %i  mx %i\n", ux, uix, mx);
+	if (uy>=uiy) 
+		my = uiy+(uy-uiy)/2;
+	else my = uy+(uiy-uy)/2;
+//	printf("y %i  iy %i  my %i\n", uy, uiy, my);
+
+	if ( ((mx==ux) && (my==uy)) || \
+		((mx==uix) && (my==uiy)))
+		return 0;
+		
+	//if (pixels[my*640+mx]>=200)
+	if (image[my*xsize+mx]>=100)
+		r=1;
+
+	return r;
+}
+
+#define COLOR_FONDO 200
+#define COLOR_BAJO 40
+
+int vecino_es_fondo(int x, int y, int xsize, int ysize, double *image) {
+
+	if ((x<=0) || (x>=xsize-1)) return 1;
+	if ((y<=0) || (y>=ysize-1)) return 1;
+
+	/* verificamos los 8 vecinos buscando fondo*/
+	if (image[y*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[y*xsize+(x+1)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x)] >= COLOR_FONDO) return 1;
+	if (image[(y-1)*xsize+(x+1)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x-1)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x)] >= COLOR_FONDO) return 1;
+	if (image[(y+1)*xsize+(x+1)] >= COLOR_FONDO) return 1;
+
+	return 0;
+}
+
+
+void medias_grises(int xsize, int ysize, double *image) {
+	int x, y;
+	int bajo, medio, alto;
+
+	bajo=0;
+	medio=0;
+	alto=0;
+
+	for (y=0;y<ysize;y++) {
+	for (x=0;x<xsize;x++) {
+		if (image[y*xsize+x] < COLOR_BAJO) 
+			bajo++;
+		else if (image[y*xsize+x] < COLOR_FONDO) 
+			medio++;
+		else
+			alto++;
+	}}
+//       fprintf(stderr, "\n\n\n\n\n\t color de pelo = %i \n\t gris = %i\n\t fondo = %i\n", (bajo*100/(xsize*ysize)), (medio*100/(xsize*ysize)), (alto*100/(xsize*ysize)) );
+
+}
+
+void filtro_medula(int xsize, int ysize, double *image) {
+	int x, y;
+
+	for (y=0;y<ysize;y++) {
+	for (x=0;x<xsize;x++) {
+		if ((image[y*xsize+x] < 150) && 
+		(! vecino_es_fondo(x, y, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x-1, y-1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x-1, y+1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x+1, y-1, xsize, ysize, image)) &&
+		(! vecino_es_fondo(x+1, y-1, xsize, ysize, image)) )
+			image[y*xsize+x] = 0;
+	}}
+
+}
+
+
+double medidas[200]; // cada medida encontrada, util para luego sacar la variancia y la desviacion estandar
+
+void calcular_varianza_desvio_estandar(int sum, int cant, int mi) {
+       double varianza = 0;
+       double desv_estandar = 0;
+       double media = (double) sum/cant;
+       int cant_en_desviacion = 0;     // cantidad de medidas dentro de la desviacion estandar
+       int i;
+
+       for (i=0;i<mi;i++) 
+               varianza = varianza + pow ( (medidas[i]-media) , 2);
+       varianza = varianza / mi;
+       desv_estandar = sqrt(varianza);
+       for (i=0;i<mi;i++) 
+               if (  ((media - desv_estandar) <= medidas[i] )   &&  (medidas[i] <= (media + desv_estandar)) )
+                       cant_en_desviacion++;
+
+       fprintf(stderr, "\n\tNro de Mediciones = %i \tMedia = %f\n", mi, media);
+       fprintf(stderr, "\tVarianza : %f\n", varianza);
+       fprintf(stderr, "\tDesviacion estandar : %f\n", sqrt(varianza));
+       fprintf(stderr, "\tMedidas dentro de la desviacion estandar : %i (%i%)\n\n", cant_en_desviacion,cant_en_desviacion*100/mi);
+
+}
+
+
+void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int cota_superior, int cota_inferior, double *image)
 {
 	/* x,y punto medio del segmento */
-	int cant=1, sum=0;
+	int cant=0, sum=0;
 	int i, j, k;
 	double mx, my, Mx, My, pmx, pmy;
 	double x, y; // x e y del punto origen 
 	double pb, pp; // desplazamiento y pendiente de la perpendicular a un punto
 	double ix, iy; // x e y de la interseccion entre las dos rectas 
 	double d; //distancia entre dos puntos
+
 
 /* Creamos un archivo eps para anexar */
   FILE * eps;
@@ -1154,6 +1278,35 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 
 /* Fin de Creamos un archivo eps para anexar */
 
+
+/* cargamos toda la imagen en un arreglo */
+	// cargar_pixels("unpelo.pgm");
+
+
+/*
+	for (i=0;i<480;i++) {
+		printf ("fila %i : ",i);
+	for (j=0;j<640;j++) {
+		printf("columna %i : %i ", j, pixels[i*480+j]);
+		printf("\n");
+	}
+	};
+*/
+
+       /* para saber si son medidas buenas o malas y varianza y desviacion estandar*/
+       int mi = 0; // indice del vector medidas
+       int mi_old = 0; // indice del vector medidas
+       int cant_old=1, sum_old=0;
+       int k_old=0; // para saber si se hicieron las 3 mediciones en un segmento
+       char lineas_rojas[600];
+       char linea_roja[200];
+
+       for (i=0;i<200;i++) medidas[i]=0;
+
+	// Esto es para no medir en la medula y en segmentos muy chicos
+	int seg_muy_chico = 30;
+
+/* FIN de cargamos toda la imagen en un arreglo */
 	for(i=0;i<n;i++) {
 		mx = s[i*dim+0] <= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
 		Mx = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] : s[i*dim+2];
@@ -1171,8 +1324,10 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
 		// distancia entre los dos puntos 
 		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		// Esto es para no medir en la medula y en segmentos muy chicos
 		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
-		if (d < cota_inferior) continue;
+		if (d < seg_muy_chico) continue;
+		// RAFA if (d < cota_inferior) continue;
 
 		/*  y = -(1/m) *x + b
 		 *  b = y - ( -(1/m) *x)
@@ -1184,6 +1339,15 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
 		pp = (-1) * 1/f[i*2] ;
 		
+
+		/* para saber si son medidas buenas o malas */
+               sum_old = sum;
+               cant_old = cant;
+               mi_old = mi;
+               k_old = 0;
+               lineas_rojas[0] = '\0';
+               linea_roja[0] = '\0';
+
 		for(k=0;k<3;k++) {
 
 			/* Por cada segmento tomamos 3 puntos, inicio, medio y final */
@@ -1200,6 +1364,17 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 				x=s[i*dim+2];
 				y=s[i*dim+3];
 				break;
+			//case 3:
+				// pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+				//x = mx+(pmx-mx)/2;
+				//y = pp*x + pb;
+			//	pb = y - (   ((-1) * 1/f[i*2] ) * x  );
+			//case 4:
+				// pb = s[i*dim+1] - (   ((-1) * 1/f[i*2] ) * s[i*dim+0]  );
+			//	x = pmx+(Mx-pmx)/2;
+			//	y = pp*x + pb;
+			//	pb = y - (   ((-1) * 1/f[i*2] ) * x  );
+				
 			}
 
 		for(j=0;j<n;j++) {
@@ -1222,33 +1397,81 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 		/* Si el segmento es muy chico entonces lo descartamos como RUIDO */
 		// distancia entre los dos puntos 
 		// d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
+		// Esto es para no medir en la medula y en segmentos muy chicos
 		d = sqrt(  pow((Mx - mx),2) + pow((My-my ),2) );
-		if (d < cota_inferior) continue;
+		if (d < seg_muy_chico) continue;
+		// RAFA if (d < cota_inferior) continue;
 
 
 
-			 if ((mx >= ix) || (Mx <= ix) )
+			if ((mx >= ix) || (Mx <= ix) )
 				continue;
 			 if ((my >= iy) || (My <= iy) )
 				continue;
 				
-			 if (x >= ix)
-				continue;
+// RAFA			 if (x >= ix)
+// RAFA				continue;
 
-			// Si no son paralelos los segmentos estimamos que los segmentos no son del mismo pelo
+			// Si los segmentos NO son paralelos entonces suponemos que NO son del mismo pelo
 			// (pendientes distintas). Si las pendientes son "bastante" cercanas (casi paralelas), aceptamos el segmento como valido
+			double xp;
+			double yp;
 			double a;
-			a= f[i*2] - f[j*2];
+			double b;
+			double c;
+//			a= f[i*2] - f[j*2];
 			/* TODO : el 0.1 tiene que ser "definible", para indicar "cuan" paralela aceptamos los segmentos opuestos */
-			if ( (a < -0.1) || (a > 0.1) )
+//			if ( (a < -0.1) || (a > 0.1) )
+//				continue;
+
+			/* si x1 y x2 son iguales entonces el pelo es vertical, es un caso extremo para las pendientes */
+			//xp = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			if (s[i*dim+0] >= s[i*dim+2])
+				xp = s[i*dim+0] - s[i*dim+2];
+			else
+				xp = s[i*dim+2] - s[i*dim+0];
+
+			//b = s[j*dim+0] >= s[j*dim+2] ? s[j*dim+0] - s[j*dim+2]: s[j*dim+2] - s[j*dim+0];
+			if (s[j*dim+0] >= s[j*dim+2])
+				b = s[j*dim+0] - s[j*dim+2];
+			else
+				b = s[j*dim+2] - s[j*dim+0];
+			if ((xp <= 0.1) && (b > 0.1))
 				continue;
 
-
+			/* si y1 y y2 son iguales entonces el pelo es horizontal, es un caso extremo para las pendientes */
+			yp = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			b = s[j*dim+1] >= s[j*dim+3] ? s[j*dim+1] - s[j*dim+3]: s[j*dim+3] - s[j*dim+1];
+			if ((xp > 0.1) && (yp <= 0.1) && (b > 0.1))
+				continue;
+			
+			/* si el pelo esta inclinado nos fijamos si son paralelos los segmentos analizados */
+			// a = s[i*dim+0] >= s[i*dim+2] ? s[i*dim+0] - s[i*dim+2]: s[i*dim+2] - s[i*dim+0];
+			// b = s[i*dim+1] >= s[i*dim+3] ? s[i*dim+1] - s[i*dim+3]: s[i*dim+3] - s[i*dim+1];
+			c= f[i*2] >= f[j*2] ? f[i*2] - f[j*2] : f[j*2] - f[i*2];
+			if ((xp > 0.1) && (yp > 0.1) && (c > 0.1))
+				continue;
+			
 			/* Si la perpendicular intersecta algun otro segmento entonces 
 			 * es una perpendicular confusa, con ruido 
 			 */
 			if ( intersecta(x, y, ix, iy, i, j, pb, pp, n, f, s, dim) )
 				continue;
+
+			/* Verificamos si el punto medio de la perpendicular está dentro o fuera de un pelo */
+			//mx = x>=ix ? ix+(x-ix)/2 : x+(ix-x)/2;
+			//if ((x==ix) || (mx==0)) mx=x;
+
+			//my = y>=iy ? iy+(y-iy)/2 : y+(iy-y)/2;
+			//if ((y==iy) || (my==0)) my=y;
+			//printf("color=%i \n", pixels[(int)(my*640+mx)]);
+			//printf("%f %f %i\n", x, y, pixels[(unsigned int)(my*640+mx)]);
+//			printf("%f %f %i\n", mx, my, pixels[(unsigned int)(my*480+mx)]);
+			// if (pixels[(unsigned int)((my)*480+mx)]>=200)
+			//if (pixels[(unsigned int)(y*480+x)]>=200)
+			if (es_fondo(x, y, ix, iy, image, xsize, ysize))
+			 	continue;
+
 
 			  // distancia entre los dos puntos 
 			  // d = sqrt(  (x2 - x1)^2 + (y2-y1)^2 )
@@ -1260,13 +1483,25 @@ void grosor(double * s, double * f, int n, int dim, int xsize, int ysize, int co
 				 */
 				sum = sum + d;
 				cant++;
+
+                                k_old++;
+                               medidas[mi] = d; mi++;
+
+                               fprintf(stderr, "d = %f\n", d);
+
+       
+
 /* Agregamos datos al archivo grosordelpelo.eps */
-      fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+      // fprintf( eps,"newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
+ sprintf(linea_roja, "newpath %f %f moveto %f %f lineto 1 0 0 setrgbcolor 4  setlinewidth stroke\n",
 x,
 (double) ysize - y,
                ix, 
 (double) ysize - iy
                  );
+
+       strcat(lineas_rojas, linea_roja);
+
 /* Fin de Agregamos datos al archivo grosordelpelo.eps */
 
 			}
@@ -1276,9 +1511,23 @@ x,
 		}		/* del for j */
 		}		/* del for k */
 		
+		/* Si hay al menos 2 medidas de 3 buenas entonces las aceptamos como validas */
+               if (k_old < 2) {
+                       sum = sum_old;
+                       cant = cant_old;
+                       mi = mi_old;
+                       fprintf(stderr, "Medidas malas \n");
+               } else {
+                       fprintf( eps,"%s", lineas_rojas);
+                       fprintf(stderr, "Medidas buenas \n");
+               }
+
+
 	}
-	/* printf("Hello World del Grosor del PELO (en pixels) = %i\n", sum/cant); */
-	printf("Grosor del PELO en pixels : %i\n", sum/cant);
+	if (cant==0) cant=1;
+	if (mi==0) mi=1;
+	calcular_varianza_desvio_estandar(sum, cant, mi); // mi es el indice del vector, nro de medidas
+	printf("Grosor del PELO en pixels : %f\n", (double)sum/cant);
 
 
 
@@ -1324,6 +1573,10 @@ int main(int argc, char ** argv)
   /* read input file */
   image = read_pgm_image_double(&X,&Y,get_str(arg,"in"));
 
+  /* RAFA */
+  filtro_medula(X, Y, image);
+
+
   /* execute LSD */
   segs = LineSegmentDetection( &n, image, X, Y,
                                get_double(arg,"scale"),
@@ -1341,7 +1594,9 @@ int main(int argc, char ** argv)
   	double fcs[n][2];
 	//fcs = malloc(n*2);
 	pendientes(segs, (double *)fcs, n, dim);
-	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior);
+	grosor(segs, (double *)fcs, n, dim, X, Y, cota_superior, cota_inferior, image);
+  /* RAFA */
+  medias_grises(X, Y, image);
     // write_eps(segs,n,dim,get_str(arg,"epsfile"),X,Y,get_double(arg,"width"));
 
 

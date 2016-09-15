@@ -36,7 +36,7 @@ class PelosVisionTkGui(Frame):
          
        	self.parent = parent
 
-        self.parent.title("Hello World para calcular grosor de pelo")
+        self.parent.title("Analisis Digital de Diametro de Fibra UNCOMA")
         self.style = Style()
         self.style.theme_use("default")
         self.pack(fill=BOTH, expand=1)
@@ -47,20 +47,25 @@ class PelosVisionTkGui(Frame):
 	for i in range(20):
 		self.rowconfigure(i, weight=1)
 
-        lbl = Label(self, text="Limite de grosor máximo (en pixels)")
-        lbl.grid(row=1,column=0, sticky=W, pady=4, padx=5) 
+        lbl = Label(self, text="Valor máximo de aceptación de diametro (en pixels)")
+        lbl.grid(row=13,column=0, sticky=W, pady=4, padx=5) 
 
 	self.limite = Entry(self)
-	self.limite.grid(row=1, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
+	self.limite.grid(row=13, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.limite.delete(0, END)
-	self.limite.insert(0, "70")
+	self.limite.insert(0, "50")
 
-        lbl = Label(self, text="Grosor obtenido (en pixels)")
+	self.lbl_estadistica = Text(self, height=10, width=60)
+        self.lbl_estadistica.grid(row=1,column=1, sticky=W, pady=1, padx=5) 
+	self.lbl_estadistica.insert(END, "Hola que tal")
+        lbl = Label(self, text="Estadistica obtenida :")
+        lbl.grid(row=1,column=0, sticky=W, pady=1, padx=5) 
+        lbl = Label(self, text="Diametro obtenido (MEDIA, en pixels)")
         lbl.grid(row=2,column=0, sticky=W, pady=1, padx=5) 
 	self.grosor = Entry(self)
 	self.grosor.grid(row=2, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
         
-        lbl = Label(self, text="Grosor obtenido (en micrones)")
+        lbl = Label(self, text="Diametro obtenido (MEDIA, en micrones)")
         lbl.grid(row=3,column=0, sticky=W, pady=1, padx=5) 
 	self.grosormicron = Entry(self)
 	self.grosormicron.grid(row=3, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
@@ -94,7 +99,7 @@ class PelosVisionTkGui(Frame):
 	self.micron = Entry(self)
 	self.micron.grid(row=10, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.micron.delete(0, END)
-	self.micron.insert(0, "1")
+	self.micron.insert(0, "0.9743")
 
         lbl = Label(self, text="Valor deseado en la Secuencia de Fotos")
         lbl.grid(row=11,column=0, sticky=W, pady=1, padx=5) 
@@ -103,12 +108,12 @@ class PelosVisionTkGui(Frame):
 	self.secuencia.delete(0, END)
 	self.secuencia.insert(0, "1")
 
-        lbl = Label(self, text="Valor minimo de grosor de pelo (en micrones)")
+        lbl = Label(self, text="Valor minimo de aceptacion de diametro (en pixels)")
         lbl.grid(row=12,column=0, sticky=W, pady=1, padx=5) 
 	self.minimo = Entry(self)
 	self.minimo.grid(row=12, column=1, columnspan=1, padx=1, sticky=E+W+S+N)
 	self.minimo.delete(0, END)
-	self.minimo.insert(0, "15")
+	self.minimo.insert(0, "10")
 
 	menu = Menu(root)
 	root.config(menu=menu)
@@ -138,13 +143,22 @@ class PelosVisionTkGui(Frame):
 		# ../lsd_1.6/lsd -P salida.eps imagenes/Pelo40X.pgm  salida.txt
 		# output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-a", "100", "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
 		output = Popen(["../lsd_1.6/lsd", "-T", self.minimo.get(), "-t", self.limite.get(), "-P", "salida.eps", filename, "salida.txt"], stdout=PIPE).communicate()[0]
-		output2 = Popen(["cat", "salida.txt"], ).communicate()[0]
+		output2 = Popen(["./backup-de-la-foto.sh"], ).communicate()[0]
 		output = output.replace('Grosor del PELO en pixels : ', '')
 		self.grosor.delete(0, END)
 		self.grosor.insert(0, output)
 		self.grosormicron.delete(0, END)
 		self.grosormicron.insert(0, float(output)*float(self.micron.get()))
 		print output
+
+		self.lbl_estadistica.delete('1.0', END)
+		# Las mediciones por rangos
+		output = Popen(["./procesar_rangos.sh", filename ], stdout=PIPE).communicate()[0]
+		self.lbl_estadistica.insert('1.0', output)
+		# Las mediciones clasicas
+		output = Popen(["./procesar.sh", self.minimo.get(), self.limite.get(), filename ], stdout=PIPE).communicate()[0]
+		self.lbl_estadistica.insert('4.0', '\n')
+		self.lbl_estadistica.insert('5.0', output)
 
     def mostrarFoto2(self,filename):
 		# Hay que ejecutar para hacer merge de los EPS generados :
@@ -269,7 +283,7 @@ class PelosVisionControl(Frame):
 
  
     def acercade(self):
-	    label = tkMessageBox.showinfo("Acerca de", "Hello World para calcular grosor de pelo\n\nEste programa en Python Tk y Opencv toma una foto desde una camara usb, la guarda en formato PGM, la analiza con lsd y calcula el grosor (media) de los pelos en la foto. Muestra la foto tomada y la resultante con los calculos. \n\nCopyright (C) 2015 Rafael Ignacio Zurita y Rodolfo del Castillo\n\nFacultad de Informatica\nUniversidad Nacional del Comahue\n\nThis program is free software; you can redistribute it and/or modify it under the terms of the GPL v2")
+	    label = tkMessageBox.showinfo("Acerca de", "Analisis Digital de Diametro de Fibra UNCOMA\n\nEste programa en Python Tk y Opencv toma una foto desde una camara usb, la guarda en formato PGM, la analiza con lsd y calcula el diametro (media) de fibras en la foto. Presenta la foto capturada y sus resultados. \n\nCopyright (C) 2015 Rafael Ignacio Zurita y Rodolfo del Castillo\n\nFacultad de Informatica\nUniversidad Nacional del Comahue\n\nThis program is free software; you can redistribute it and/or modify it under the terms of the GPL v2")
 		         
  
     def no_hacer_nada(self):

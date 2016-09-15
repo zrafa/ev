@@ -1,0 +1,22 @@
+
+Regla 0.1 (100um) tiene un Ancho de 112 pixels
+
+Si 113.5 pixels son 100 micrones entonces
+
+1 pixel es 0.8810 micrones
+
+
+
+Regla 0.76 (75um) tiene un Ancho de 78 pixels
+
+Si 78 pixels son 76 micrones
+
+1 pixel es 0.9743 micrones
+
+
+
+
+Regla de 0.03mm
+37 pixels.
+
+1 pixel =  0.8108 micrones
