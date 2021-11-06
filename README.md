@@ -49,6 +49,15 @@ Testear con :
 Y calcula el diametro de la fibra directamente.
 El algoritmo utilizado para realizacion la estadistica esta autodocumentado en el código.
 
+Como realizar mediciones
+========================
+
+El valor medio de animales por productor es variable según la zona, y oscila entre 250 y 500 cabezas.
+
+En cuanto a la categoría de animal a medir, mínimamente se deberían evaluar los machos (llamados "castrones"), equivalente al 4-5% del total (del "piño"). Sería bueno también medir las hembras que entren a servicio (aprox. un 70% del total).
+
+Para una correcta medición hay que tomar 3 medidas (cuarto, costillar y paleta), y de cada lugar varias fibras (50-100).
+
 
 Salida testeada en la SIE
 =========================
