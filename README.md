@@ -1,8 +1,7 @@
 ev - Analisis Digital de Diametro de Fibra UNCOMA
 =================================================
 
-Este proyecto de I+D reune los temas visión embebida en una aplicación 
-para calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones). El prototipo está orientado a ser utilizado en el campo directamente, midiendo la fibra sobre el animal.
+Este proyecto de I+D reune los temas de hardware y software para lograr visión embebida capaz de calcular el diametro de una fibra de cabra u oveja (en micrones con una precisión de +/- 0.5 micrones). El prototipo está orientado a ser utilizado en el campo directamente, midiendo la fibra sobre el animal.
 
 General Description
 ===================
@@ -12,6 +11,8 @@ This eliminates the need for intensive preparation of the fibre and, with a mini
 results can be achieved quickly and easily.
 The set of diameter measurements obtained during this process forms the basis from which other statistics of
 interest are derived.
+
+![alt text](extras/prototipo.png "Prototipo UNCOMA")
 
 It lets to perform the measurement and
 characterisation of fibre diameter to within one micron without removing
